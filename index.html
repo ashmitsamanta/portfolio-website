@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050505" />
+    <title>Ashmit — Full-Stack Developer</title>
+    <meta name="description" content="CSE student and Full-Stack Developer building high-performance web applications, document verification systems, and fraud-detection layers with FastAPI, PostgreSQL, Python, and React.js." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ashmit — Full-Stack Developer" />
+    <meta property="og:description" content="Building data pipelines, backend services, and fraud-detection logic with FastAPI, PostgreSQL, and React.js." />
+    <meta property="og:image" content="/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              serif: ['Playfair Display', 'Georgia', 'serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+        background-color: #050505;
+        color: #F2EFE9;
+      }
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+      .metallic-wordmark {
+        background: linear-gradient(180deg, #FFFFFF 0%, #E4E4E7 42%, #9CA3AF 72%, #3F3F46 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
+      }
+      /* Custom subtle dark scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #050505;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #262626;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #404040;
+      }
+    </style>
+  </head>
+  <body class="bg-[#050505] text-[#F2EFE9]">
+    <!-- Ambient Film Grain: Fixed full-screen non-blocking SVG feTurbulence fractalNoise overlay at opacity: 0.03 with mix-blend-mode: overlay -->
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03] mix-blend-overlay" aria-hidden="true">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <filter id="filmGrainFilter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#filmGrainFilter)" />
+      </svg>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
