@@ -2,10 +2,8 @@ export interface PortfolioConfig {
   personal: {
     name: string;
     shortName: string;
-    headlineTop: string;
     role: string;
     roleItalic: string;
-    tagline: string;
     bio: string;
     location: string;
     timezone: string;
@@ -23,11 +21,6 @@ export interface PortfolioConfig {
     linkedin: string;
     github: string;
   };
-  metrics: Array<{
-    value: string;
-    label: string;
-    sub: string;
-  }>;
   stackCategories: Array<{
     id: string;
     label: string;
@@ -58,24 +51,14 @@ export interface PortfolioConfig {
     primaryUrl: string;
     githubUrl: string;
   }>;
-  shelfComponents: Array<{
-    id: string;
-    name: string;
-    price: string;
-    size: string;
-    category: string;
-    description: string;
-  }>;
 }
 
 export const PORTFOLIO_CONFIG: PortfolioConfig = {
   personal: {
     name: 'ASHMIT',
     shortName: 'ASHMIT',
-    headlineTop: 'PORTFOLIO',
     role: 'Full-Stack',
     roleItalic: 'Developer',
-    tagline: 'FastAPI • PostgreSQL • Python • React.js',
     bio: "Hey, I'm Ashmit. A CSE student building full-stack web applications with FastAPI, PostgreSQL, and React.js. I developed the backend and document-processing pipelines for Veribyte, a document verification system, and built the backend and graph-analysis layer for CyberScope, a fraud-detection dashboard designed to identify suspicious transactions. I work primarily with Python, using it to build data pipelines, backend services, and fraud-detection logic. I enjoy turning complex problems into practical, reliable software solutions.",
     location: 'New Town, West Bengal, India',
     timezone: 'Asia/Kolkata',
@@ -90,12 +73,6 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
     linkedin: 'https://www.linkedin.com/in/ashmit-samanta-14022b43b/',
     github: 'https://github.com/ashmitsamanta'
   },
-  metrics: [
-    { value: '02+', label: 'Flagship Systems', sub: 'Veribyte & CyberScope architecture' },
-    { value: '99.9%', label: 'Pipeline Reliability', sub: 'FastAPI & PostgreSQL data pipelines' },
-    { value: '66.1 KB', label: 'Component Shelf', sub: '6 zero-dependency UI primitives' },
-    { value: '60 FPS', label: 'Fluid Motion', sub: 'HTML5 Canvas & Spring physics' }
-  ],
   stackCategories: [
     {
       id: 'backend',
@@ -157,7 +134,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       titleSuffix: 'IDENTITY & DOCUMENT VERIFICATION',
       category: 'Web & AI',
       badge: '',
-      image: '/assets/veribyte.png',
+      image: '/assets/veribyte.webp',
       description: 'An AI-assisted identity and document verification platform, built with React, Vite, and a FastAPI backend with Supabase. Features OCR extraction (Tesseract, PassportEye), Verhoeff, PAN, and MRZ validators, ELA-based tamper detection, InsightFace face matching, a SigLIP deepfake check, and live SSE streaming of verification results.',
       detailsDescription: "An AI-assisted identity and document verification platform, built with React and Vite on a FastAPI backend with Supabase. Runs uploaded documents through OCR extraction, checksum validation, tamper detection, face matching, and a deepfake check, and streams each stage's result to the UI as it completes.",
       highlights: [
@@ -179,7 +156,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       titleSuffix: 'CYBER-FRAUD INTELLIGENCE PLATFORM',
       category: 'Web & Security',
       badge: 'Full-Stack Platform',
-      image: '/assets/cyberscope.png',
+      image: '/assets/cyberscope.webp',
       description: 'An explainable fraud intelligence platform that links messages, phone numbers, URLs, payment identifiers, and bank accounts into a single fraud graph. Built with FastAPI, SQLAlchemy, and NetworkX, with JWT authentication, rule-based risk scoring, recursive BFS fund tracing, and an LLM chat assistant. Ships with a 20-test pytest suite, a synthetic benchmark dataset, and Docker and Nginx deployment.',
       detailsDescription: 'An explainable fraud investigation platform that links scam messages, phone numbers, URLs, payment identifiers, and bank accounts into a single fraud graph. Built with a FastAPI backend, NetworkX graph engine, and a multi-page Vite frontend, with JWT authentication, transparent rule-based risk scoring, and recursive fund tracing across linked accounts.',
       highlights: [
@@ -193,56 +170,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       githubUrl: 'https://github.com/ashmitsamanta/CyberScope.git'
     }
   ],
-  shelfComponents: [
-    {
-      id: 'meniscus',
-      name: 'Meniscus',
-      price: '$12',
-      size: '13.7 KB • Navigation',
-      category: 'Navigation',
-      description: 'Working 3-tab liquid bottom navigation switcher with smooth slide indicator and haptic-style micro-bounce.'
-    },
-    {
-      id: 'lucid',
-      name: 'Lucid',
-      price: '$5',
-      size: '8 KB • Navigation',
-      category: 'Navigation',
-      description: 'Working 3-segment liquid glass bar with frosted glass highlight pill and instant tactile state switching.'
-    },
-    {
-      id: 'sigil',
-      name: 'Sigil',
-      price: '$10',
-      size: '12.2 KB • Form',
-      category: 'Form',
-      description: 'Working 4-digit security code input that seals and locks itself with haptic feedback once the 4th digit is typed.'
-    },
-    {
-      id: 'quarto',
-      name: 'Quarto',
-      price: '$10',
-      size: '10.1 KB • Form',
-      category: 'Form',
-      description: 'Working 4-quadrant tactile grid that dynamically folds into a single unified card upon clicking.'
-    },
-    {
-      id: 'parachute',
-      name: 'Parachute',
-      price: '$5',
-      size: '9.2 KB • Animation',
-      category: 'Animation',
-      description: 'Working multi-stage progress button that transitions from idle to percentage drop to landed checkmark state.'
-    },
-    {
-      id: 'quench',
-      name: 'Quench',
-      price: '$5',
-      size: '11.9 KB • Form',
-      category: 'Form',
-      description: 'Working liquid-state submit button with animated liquid fill progression and tactile success release.'
-    }
-  ]
+
 };
 
 export default PORTFOLIO_CONFIG;

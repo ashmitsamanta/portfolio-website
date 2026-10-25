@@ -2,27 +2,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ArrowUpRight,
   ArrowDownLeft,
-  ArrowDownRight,
-  Sparkles,
   Check,
   Copy,
   Pause,
   RotateCcw,
-  Sliders,
   X,
-  ChevronDown,
   Github,
   Linkedin,
   Mail,
-  MapPin,
-  MessageCircle,
-  Download,
   Send,
   ArrowUp,
-  ExternalLink,
   Eye
 } from 'lucide-react';
-import gsap from 'gsap';
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
@@ -61,45 +52,24 @@ const PIXEL_FONT = {
 const DEFAULT_CONFIG = PORTFOLIO_CONFIG;
 
 const PROJECT_ATLAS_IMAGES = [
-  '/assets/veribyte.png',
-  '/assets/cyberscope.png'
+  '/assets/veribyte.webp',
+  '/assets/cyberscope.webp'
 ];
 
+const CONTACT_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
 export default function App() {
-  const [config, setConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem('portfolio_ashmit_config_v2');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...DEFAULT_CONFIG,
-          ...parsed,
-          services: DEFAULT_CONFIG.services,
-          projects: DEFAULT_CONFIG.projects,
-          personal: { ...DEFAULT_CONFIG.personal, ...parsed.personal }
-        };
-      }
-    } catch (e) {
-      // ignore storage errors
-    }
-    return DEFAULT_CONFIG;
-  });
+  const config = DEFAULT_CONFIG;
 
   const [introRunId, setIntroRunId] = useState(0);
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
-  const [revealVal, setRevealVal] = useState(0);
-  const revealObjRef = useRef({ reveal: 0 });
-  const maxSettleTimeRef = useRef(3.2);
   const heroSectionRef = useRef(null);
   const portraitAnchorRef = useRef(null);
-  const [particleCountLabel, setParticleCountLabel] = useState(0);
-
 
   // Navigation & UI state
   const [activeNav, setActiveNav] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [localTime, setLocalTime] = useState('');
   const [toastMsg, setToastMsg] = useState(null);
 
   // Interactive sections state
@@ -115,9 +85,7 @@ export default function App() {
   // Hero 3D parallax state
   const [heroTilt, setHeroTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50 });
 
-  // Customizer Drawer & Optional Brief Modal
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorTab, setEditorTab] = useState('personal');
+  // Optional Brief Modal
   const [showContactFormModal, setShowContactFormModal] = useState(false);
 
   // Contact form state
@@ -125,7 +93,8 @@ export default function App() {
     name: '',
     email: '',
     subject: 'React Native App Project',
-    message: ''
+    message: '',
+    botField: ''
   });
   const [contactStatus, setContactStatus] = useState('idle');
 
@@ -169,36 +138,11 @@ export default function App() {
     [showToast]
   );
 
-  const replayIntroAnimation = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setHeroControlsVisible(false);
-    setIntroRunId((n) => n + 1);
-  }, []);
 
   const handleSlideDown = useCallback(() => {
     setHeroControlsVisible(true);
   }, []);
 
-  // Live clock
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      try {
-        const formatted = now.toLocaleTimeString('en-US', {
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        setLocalTime(formatted);
-      } catch (e) {
-        setLocalTime(now.toTimeString().slice(0, 8));
-      }
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Track scroll position for navbar transparency transition
   useEffect(() => {
@@ -210,14 +154,6 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Save config changes to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('portfolio_custom_config_v5', JSON.stringify(config));
-    } catch (e) {
-      // ignore storage errors
-    }
-  }, [config]);
 
   // Smooth scroll to section
   const scrollToSection = (id) => {
@@ -338,11 +274,19 @@ export default function App() {
   }, [initGameCanvas, gameState]);
 
   useEffect(() => {
+    const isFormElement = (target) => {
+      if (!target || !target.tagName) return false;
+      const tag = target.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    };
+
     const down = (e) => {
+      if (isFormElement(e.target)) return;
       if (e.key === 'ArrowLeft') gameRef.current.keys.left = true;
       if (e.key === 'ArrowRight') gameRef.current.keys.right = true;
     };
     const up = (e) => {
+      if (isFormElement(e.target)) return;
       if (e.key === 'ArrowLeft') gameRef.current.keys.left = false;
       if (e.key === 'ArrowRight') gameRef.current.keys.right = false;
     };
@@ -559,21 +503,42 @@ export default function App() {
     ]
   ];
 
-  const generateConfigCode = () => {
-    return `export const portfolioConfig = ${JSON.stringify(config, null, 2)} as const;\n`;
-  };
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
+    if (contactForm.botField) {
+      return;
+    }
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
       showToast('Please fill in your name, email, and message.');
       return;
     }
     setContactStatus('sending');
-    setTimeout(() => {
-      setContactStatus('sent');
-      showToast('Message prepared! You can also send directly via Email.');
-    }, 600);
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: contactForm.name.trim(),
+          email: contactForm.email.trim(),
+          subject: contactForm.subject,
+          message: contactForm.message.trim()
+        })
+      });
+
+      if (response.ok) {
+        setContactStatus('sent');
+        showToast('Message sent! I will get back to you soon.');
+      } else {
+        throw new Error('Submission failed');
+      }
+    } catch (err) {
+      setContactStatus('idle');
+      showToast('Unable to send message. Please use the email button directly.');
+    }
   };
 
 
@@ -630,13 +595,6 @@ export default function App() {
         }
       `}</style>
 
-      {/* Fixed Ambient Film Grain */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 opacity-[0.03] mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
-        }}
-      />
 
       {/* Toast Notification */}
       {toastMsg && (
@@ -730,28 +688,30 @@ export default function App() {
         )}
       </header>
 
-      {/* 1. EXACT PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
-      <section
-        id="home"
-        ref={heroSectionRef}
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const px = (e.clientX - rect.left) / rect.width - 0.5;
-          const py = (e.clientY - rect.top) / rect.height - 0.5;
-          setHeroTilt({
-            rx: py * 14,
-            ry: px * 18,
-            gx: (px + 0.5) * 100,
-            gy: (py + 0.5) * 100
-          });
-        }}
-        onMouseLeave={() => {
-          setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
-        }}
-        className="relative min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
-        style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
-      >
-        {/* Soft center radial glow visible during preloader */}
+      <main>
+        {/* 1. EXACT PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
+        <section
+          id="home"
+          ref={heroSectionRef}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / rect.width - 0.5;
+            const py = (e.clientY - rect.top) / rect.height - 0.5;
+            setHeroTilt({
+              rx: py * 14,
+              ry: px * 18,
+              gx: (px + 0.5) * 100,
+              gy: (py + 0.5) * 100
+            });
+          }}
+          onMouseLeave={() => {
+            setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
+          }}
+          className="relative min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
+          style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
+        >
+          <h1 className="sr-only">Ashmit - Full-Stack Developer</h1>
+          {/* Soft center radial glow visible during preloader */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[340px] rounded-full blur-3xl transition-opacity duration-700"
           style={{
@@ -899,12 +859,14 @@ export default function App() {
           <div className="space-y-3 overflow-hidden stack-edge-mask py-1">
             {marqueeRows.map((rowItems, rowIdx) => {
               const duplicated = [...rowItems, ...rowItems, ...rowItems];
-              const animClass =
-                rowIdx % 2 === 0 ? 'animate-marquee-left' : 'animate-marquee-right';
               return (
                 <div key={rowIdx} className="overflow-hidden w-full">
                   <div
-                    className={`${animClass} gap-3`}
+                    className={
+                      rowIdx % 2 === 0
+                        ? 'animate-marquee-left gap-3'
+                        : 'animate-marquee-right gap-3'
+                    }
                     style={marqueePaused ? { animationPlayState: 'paused' } : {}}
                   >
                     {duplicated.map((tech, idx) => (
@@ -1427,6 +1389,7 @@ export default function App() {
           </footer>
         </div>
       </section>
+      </main>
 
       {/* QUICK BRIEF FORM MODAL */}
       {showContactFormModal && (
@@ -1441,6 +1404,16 @@ export default function App() {
             </button>
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <h3 className="text-xl font-black uppercase">Send Project Brief</h3>
+              <input
+                type="text"
+                name="_gotcha"
+                value={contactForm.botField}
+                onChange={(e) => setContactForm({ ...contactForm, botField: e.target.value })}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
               <div>
                 <label className="block font-mono text-xs uppercase text-neutral-400 mb-1">
                   Your Name
@@ -1575,301 +1548,6 @@ export default function App() {
                   </a>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* LIVE "CUSTOMIZE MY DETAILS" DRAWER & CONFIG EXPORTER */}
-      {editorOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-xl bg-[#0C0C0C] border-l border-white/15 h-full flex flex-col justify-between overflow-hidden">
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
-                  LIVE PORTFOLIO CUSTOMIZER
-                </div>
-                <h3 className="text-xl font-black uppercase tracking-tight">
-                  Replace With Your Personal Details
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditorOpen(false)}
-                className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-neutral-300"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="px-6 pt-3 border-b border-white/10 flex gap-2">
-              {[
-                { id: 'personal', label: 'Identity & Bio' },
-                { id: 'contact', label: 'Contact & Socials' },
-                { id: 'export', label: 'Export Config.ts' }
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setEditorTab(t.id)}
-                  className={`px-3.5 py-2 font-mono text-xs uppercase border-b-2 transition-all ${
-                    editorTab === t.id
-                      ? 'border-[#FF5C3D] text-white font-bold'
-                      : 'border-transparent text-neutral-400 hover:text-white'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              {editorTab === 'personal' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Full Name (Navbar & Footer)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.name}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, name: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Loading Name Word (e.g. HASIBUL)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.shortName}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, shortName: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Primary Role (Bold)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.role}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, role: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Role Suffix (Italic Serif)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.roleItalic}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, roleItalic: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Intro Card Biography
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={config.personal.bio}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          personal: { ...config.personal, bio: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Arcade Word 1 (Max 8 chars)
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={8}
-                        value={config.personal.gameWordTop}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: {
-                              ...config.personal,
-                              gameWordTop: e.target.value.toUpperCase()
-                            }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Arcade Word 2 (Max 8 chars)
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={8}
-                        value={config.personal.gameWordBottom}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: {
-                              ...config.personal,
-                              gameWordBottom: e.target.value.toUpperCase()
-                            }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-2">
-                      Accent Theme Color
-                    </label>
-                    <div className="flex items-center gap-3">
-                      {[
-                        { label: 'Flame (#FF5C3D)', hex: '#FF5C3D' },
-                        { label: 'Editorial Pearl (#E8E4DC)', hex: '#E8E4DC' },
-                        { label: 'Emerald (#10B981)', hex: '#10B981' },
-                        { label: 'Cyber Cyan (#38BDF8)', hex: '#38BDF8' }
-                      ].map((c) => (
-                        <button
-                          key={c.hex}
-                          type="button"
-                          onClick={() => setConfig({ ...config, accentColor: c.hex })}
-                          className={`px-3 py-1.5 rounded-full font-mono text-xs border ${
-                            config.accentColor === c.hex
-                              ? 'border-white scale-105 font-bold'
-                              : 'border-white/15 opacity-75'
-                          }`}
-                          style={{ backgroundColor: c.hex, color: '#050505' }}
-                        >
-                          {c.label.split(' ')[0]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {editorTab === 'contact' && (
-                <>
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      value={config.socials.email}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          socials: { ...config.socials, email: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Location (BASED IN)
-                    </label>
-                    <input
-                      type="text"
-                      value={config.personal.location}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          personal: { ...config.personal, location: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-                </>
-              )}
-
-              {editorTab === 'export' && (
-                <div className="space-y-3">
-                  <p className="text-xs text-neutral-400">
-                    Copy this generated <code className="text-white">src/config/portfolio.config.ts</code> file
-                    directly into your project repository:
-                  </p>
-                  <pre className="p-4 rounded-xl bg-black border border-white/10 font-mono text-[11px] text-neutral-300 overflow-x-auto max-h-80">
-                    {generateConfigCode()}
-                  </pre>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      copyText(generateConfigCode(), 'portfolio.config.ts copied to clipboard!')
-                    }
-                    className="w-full py-3 rounded-full font-mono text-xs uppercase font-bold text-black"
-                    style={{ backgroundColor: config.accentColor }}
-                  >
-                    Copy portfolio.config.ts
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="p-6 border-t border-white/10 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfig(DEFAULT_CONFIG);
-                  showToast('Reset to Ashmit Samanta reference defaults');
-                }}
-                className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 font-mono text-xs uppercase text-neutral-300"
-              >
-                Reset Defaults
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditorOpen(false);
-                  initGameCanvas(false);
-                  showToast('Portfolio updated live!');
-                }}
-                className="px-6 py-2.5 rounded-full font-mono text-xs uppercase font-bold text-black"
-                style={{ backgroundColor: config.accentColor }}
-              >
-                Apply & Close
-              </button>
             </div>
           </div>
         </div>
