@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -17,6 +17,7 @@ import {
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
+import { initScrollAnimations, refreshScrollTrigger } from './animations/scrollAnimations';
 
 // 5x5 bitmap font for the Canvas Brick Breaker ("HELLO WORLD")
 const PIXEL_FONT = {
@@ -65,6 +66,7 @@ export default function App() {
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
   const heroSectionRef = useRef(null);
   const portraitAnchorRef = useRef(null);
+  const rootRef = useRef(null);
 
   // Navigation & UI state
   const [activeNav, setActiveNav] = useState('home');
@@ -142,6 +144,21 @@ export default function App() {
   const handleSlideDown = useCallback(() => {
     setHeroControlsVisible(true);
   }, []);
+
+  // Initialize scroll-driven animations once preloader signals completion
+  useLayoutEffect(() => {
+    if (!heroControlsVisible) return;
+    const cleanup = initScrollAnimations(rootRef.current);
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [heroControlsVisible]);
+
+  // Refresh ScrollTrigger calculations whenever project list / filter changes
+  useLayoutEffect(() => {
+    if (!heroControlsVisible) return;
+    refreshScrollTrigger();
+  }, [filteredProjects, heroControlsVisible]);
 
 
   // Track scroll position for navbar transparency transition
@@ -544,6 +561,7 @@ export default function App() {
 
   return (
     <div
+      ref={rootRef}
       className="min-h-screen bg-[#000000] text-[#F2EFE9] selection:bg-[#FF5C3D] selection:text-black relative overflow-x-hidden font-sans"
       style={{ '--accent': config.accentColor }}
     >
