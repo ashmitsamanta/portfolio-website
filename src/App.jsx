@@ -57,24 +57,7 @@ const PROJECT_ATLAS_IMAGES = [
 ];
 
 export default function App() {
-  const [config, setConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem('portfolio_ashmit_config_v2');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...DEFAULT_CONFIG,
-          ...parsed,
-          services: DEFAULT_CONFIG.services,
-          projects: DEFAULT_CONFIG.projects,
-          personal: { ...DEFAULT_CONFIG.personal, ...parsed.personal }
-        };
-      }
-    } catch (e) {
-      // ignore storage errors
-    }
-    return DEFAULT_CONFIG;
-  });
+  const config = DEFAULT_CONFIG;
 
   const [introRunId, setIntroRunId] = useState(0);
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
@@ -100,9 +83,7 @@ export default function App() {
   // Hero 3D parallax state
   const [heroTilt, setHeroTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50 });
 
-  // Customizer Drawer & Optional Brief Modal
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorTab, setEditorTab] = useState('personal');
+  // Optional Brief Modal
   const [showContactFormModal, setShowContactFormModal] = useState(false);
 
   // Contact form state
@@ -170,14 +151,6 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Save config changes to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('portfolio_custom_config_v5', JSON.stringify(config));
-    } catch (e) {
-      // ignore storage errors
-    }
-  }, [config]);
 
   // Smooth scroll to section
   const scrollToSection = (id) => {
@@ -519,9 +492,6 @@ export default function App() {
     ]
   ];
 
-  const generateConfigCode = () => {
-    return `export const portfolioConfig = ${JSON.stringify(config, null, 2)} as const;\n`;
-  };
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
@@ -1528,301 +1498,6 @@ export default function App() {
                   </a>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* LIVE "CUSTOMIZE MY DETAILS" DRAWER & CONFIG EXPORTER */}
-      {editorOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-xl bg-[#0C0C0C] border-l border-white/15 h-full flex flex-col justify-between overflow-hidden">
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
-                  LIVE PORTFOLIO CUSTOMIZER
-                </div>
-                <h3 className="text-xl font-black uppercase tracking-tight">
-                  Replace With Your Personal Details
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditorOpen(false)}
-                className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-neutral-300"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="px-6 pt-3 border-b border-white/10 flex gap-2">
-              {[
-                { id: 'personal', label: 'Identity & Bio' },
-                { id: 'contact', label: 'Contact & Socials' },
-                { id: 'export', label: 'Export Config.ts' }
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setEditorTab(t.id)}
-                  className={`px-3.5 py-2 font-mono text-xs uppercase border-b-2 transition-all ${
-                    editorTab === t.id
-                      ? 'border-[#FF5C3D] text-white font-bold'
-                      : 'border-transparent text-neutral-400 hover:text-white'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              {editorTab === 'personal' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Full Name (Navbar & Footer)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.name}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, name: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Loading Name Word (e.g. HASIBUL)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.shortName}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, shortName: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Primary Role (Bold)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.role}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, role: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Role Suffix (Italic Serif)
-                      </label>
-                      <input
-                        type="text"
-                        value={config.personal.roleItalic}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: { ...config.personal, roleItalic: e.target.value }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Intro Card Biography
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={config.personal.bio}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          personal: { ...config.personal, bio: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Arcade Word 1 (Max 8 chars)
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={8}
-                        value={config.personal.gameWordTop}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: {
-                              ...config.personal,
-                              gameWordTop: e.target.value.toUpperCase()
-                            }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                        Arcade Word 2 (Max 8 chars)
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={8}
-                        value={config.personal.gameWordBottom}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            personal: {
-                              ...config.personal,
-                              gameWordBottom: e.target.value.toUpperCase()
-                            }
-                          })
-                        }
-                        className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-2">
-                      Accent Theme Color
-                    </label>
-                    <div className="flex items-center gap-3">
-                      {[
-                        { label: 'Flame (#FF5C3D)', hex: '#FF5C3D' },
-                        { label: 'Editorial Pearl (#E8E4DC)', hex: '#E8E4DC' },
-                        { label: 'Emerald (#10B981)', hex: '#10B981' },
-                        { label: 'Cyber Cyan (#38BDF8)', hex: '#38BDF8' }
-                      ].map((c) => (
-                        <button
-                          key={c.hex}
-                          type="button"
-                          onClick={() => setConfig({ ...config, accentColor: c.hex })}
-                          className={`px-3 py-1.5 rounded-full font-mono text-xs border ${
-                            config.accentColor === c.hex
-                              ? 'border-white scale-105 font-bold'
-                              : 'border-white/15 opacity-75'
-                          }`}
-                          style={{ backgroundColor: c.hex, color: '#050505' }}
-                        >
-                          {c.label.split(' ')[0]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {editorTab === 'contact' && (
-                <>
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      value={config.socials.email}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          socials: { ...config.socials, email: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-mono text-[11px] uppercase text-neutral-400 mb-1">
-                      Location (BASED IN)
-                    </label>
-                    <input
-                      type="text"
-                      value={config.personal.location}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          personal: { ...config.personal, location: e.target.value }
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                    />
-                  </div>
-                </>
-              )}
-
-              {editorTab === 'export' && (
-                <div className="space-y-3">
-                  <p className="text-xs text-neutral-400">
-                    Copy this generated <code className="text-white">src/config/portfolio.config.ts</code> file
-                    directly into your project repository:
-                  </p>
-                  <pre className="p-4 rounded-xl bg-black border border-white/10 font-mono text-[11px] text-neutral-300 overflow-x-auto max-h-80">
-                    {generateConfigCode()}
-                  </pre>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      copyText(generateConfigCode(), 'portfolio.config.ts copied to clipboard!')
-                    }
-                    className="w-full py-3 rounded-full font-mono text-xs uppercase font-bold text-black"
-                    style={{ backgroundColor: config.accentColor }}
-                  >
-                    Copy portfolio.config.ts
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="p-6 border-t border-white/10 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfig(DEFAULT_CONFIG);
-                  showToast('Reset to Ashmit Samanta reference defaults');
-                }}
-                className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 font-mono text-xs uppercase text-neutral-300"
-              >
-                Reset Defaults
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditorOpen(false);
-                  initGameCanvas(false);
-                  showToast('Portfolio updated live!');
-                }}
-                className="px-6 py-2.5 rounded-full font-mono text-xs uppercase font-bold text-black"
-                style={{ backgroundColor: config.accentColor }}
-              >
-                Apply & Close
-              </button>
             </div>
           </div>
         </div>
