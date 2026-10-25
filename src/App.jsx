@@ -688,28 +688,30 @@ export default function App() {
         )}
       </header>
 
-      {/* 1. EXACT PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
-      <section
-        id="home"
-        ref={heroSectionRef}
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const px = (e.clientX - rect.left) / rect.width - 0.5;
-          const py = (e.clientY - rect.top) / rect.height - 0.5;
-          setHeroTilt({
-            rx: py * 14,
-            ry: px * 18,
-            gx: (px + 0.5) * 100,
-            gy: (py + 0.5) * 100
-          });
-        }}
-        onMouseLeave={() => {
-          setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
-        }}
-        className="relative min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
-        style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
-      >
-        {/* Soft center radial glow visible during preloader */}
+      <main>
+        {/* 1. EXACT PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
+        <section
+          id="home"
+          ref={heroSectionRef}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / rect.width - 0.5;
+            const py = (e.clientY - rect.top) / rect.height - 0.5;
+            setHeroTilt({
+              rx: py * 14,
+              ry: px * 18,
+              gx: (px + 0.5) * 100,
+              gy: (py + 0.5) * 100
+            });
+          }}
+          onMouseLeave={() => {
+            setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
+          }}
+          className="relative min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
+          style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
+        >
+          <h1 className="sr-only">Ashmit - Full-Stack Developer</h1>
+          {/* Soft center radial glow visible during preloader */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[340px] rounded-full blur-3xl transition-opacity duration-700"
           style={{
@@ -1387,6 +1389,7 @@ export default function App() {
           </footer>
         </div>
       </section>
+      </main>
 
       {/* QUICK BRIEF FORM MODAL */}
       {showContactFormModal && (
