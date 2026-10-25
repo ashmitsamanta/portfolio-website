@@ -85,7 +85,6 @@ export default function App() {
   const [activeNav, setActiveNav] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [localTime, setLocalTime] = useState('');
   const [toastMsg, setToastMsg] = useState(null);
 
   // Interactive sections state
@@ -160,26 +159,6 @@ export default function App() {
     setHeroControlsVisible(true);
   }, []);
 
-  // Live clock
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      try {
-        const formatted = now.toLocaleTimeString('en-US', {
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        setLocalTime(formatted);
-      } catch (e) {
-        setLocalTime(now.toTimeString().slice(0, 8));
-      }
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Track scroll position for navbar transparency transition
   useEffect(() => {
