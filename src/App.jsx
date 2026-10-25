@@ -177,9 +177,13 @@ export default function App() {
   const [score, setScore] = useState(0);
   const [bricksLeft, setBricksLeft] = useState(0);
   const gameRef = useRef({
+    status: 'idle',
+    lives: 3,
+    score: 0,
+    bricksAlive: 0,
     paddleX: 260,
     paddleW: 116,
-    paddleH: 10,
+    paddleH: 9,
     ballX: 310,
     ballY: 260,
     vx: 4.2,
@@ -237,18 +241,81 @@ export default function App() {
     [config.personal.gameWordTop, config.personal.gameWordBottom]
   );
 
+  const drawGame = useCallback((ctx, w, h, g) => {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, w, h);
+
+    g.bricks.forEach((b) => {
+      if (!b.alive) return;
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+    });
+
+    for (let i = g.particles.length - 1; i >= 0; i--) {
+      const pt = g.particles[i];
+      if (g.status === 'playing') {
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.vy += 0.12;
+        pt.life -= 0.04;
+      }
+      if (pt.life <= 0) {
+        g.particles.splice(i, 1);
+        continue;
+      }
+      ctx.globalAlpha = Math.max(0, pt.life);
+      ctx.fillStyle = pt.color;
+      ctx.fillRect(pt.x, pt.y, 3, 3);
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.fillStyle = '#E5E5E5';
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(g.paddleX, h - 34, g.paddleW, g.paddleH, 5);
+    } else {
+      const r = 5;
+      const px = g.paddleX;
+      const py = h - 34;
+      const pw = g.paddleW;
+      const ph = g.paddleH;
+      ctx.moveTo(px + r, py);
+      ctx.arcTo(px + pw, py, px + pw, py + ph, r);
+      ctx.arcTo(px + pw, py + ph, px, py + ph, r);
+      ctx.arcTo(px, py + ph, px, py, r);
+      ctx.arcTo(px, py, px + pw, py, r);
+      ctx.closePath();
+    }
+    ctx.fill();
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(g.ballX, g.ballY, g.ballR, 0, Math.PI * 2);
+    ctx.fill();
+  }, []);
+
   const initGameCanvas = useCallback(
     (startImmediately = false) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const rect = canvas.parentElement.getBoundingClientRect();
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
       const w = Math.max(320, Math.floor(rect.width));
       const h = 420;
       canvas.width = w;
       canvas.height = h;
 
       const bricks = buildWordBricks(w);
+      const initialStatus = startImmediately ? 'playing' : 'idle';
+      const initialLives = 3;
+      const initialScore = 0;
+
       gameRef.current = {
+        status: initialStatus,
+        lives: initialLives,
+        score: initialScore,
+        bricksAlive: bricks.length,
         paddleX: (w - 116) / 2,
         paddleW: 116,
         paddleH: 9,
@@ -261,22 +328,46 @@ export default function App() {
         particles: [],
         keys: { left: false, right: false }
       };
-      setLives(3);
-      setScore(0);
+
+      setLives(initialLives);
+      setScore(initialScore);
       setBricksLeft(bricks.length);
-      setGameState(startImmediately ? 'playing' : 'idle');
+      setGameState(initialStatus);
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        drawGame(ctx, w, h, gameRef.current);
+      }
     },
-    [buildWordBricks]
+    [buildWordBricks, drawGame]
   );
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    let prevWidth = Math.floor(parent.getBoundingClientRect().width);
     initGameCanvas(false);
-    const onResize = () => {
-      if (gameState === 'idle') initGameCanvas(false);
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const newWidth = Math.floor(entry.contentRect.width);
+        if (newWidth > 0 && newWidth !== prevWidth) {
+          prevWidth = newWidth;
+          if (gameRef.current.status === 'idle') {
+            initGameCanvas(false);
+          }
+        }
+      }
+    });
+
+    ro.observe(parent);
+    return () => {
+      ro.disconnect();
     };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [initGameCanvas, gameState]);
+  }, [initGameCanvas]);
 
   useEffect(() => {
     const isFormElement = (target) => {
@@ -307,138 +398,114 @@ export default function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (gameState !== 'playing') {
+      drawGame(ctx, canvas.width, canvas.height, gameRef.current);
+      return;
+    }
+
     let rafId;
 
     const renderFrame = () => {
+      const g = gameRef.current;
+      if (g.status !== 'playing') return;
+
       const w = canvas.width;
       const h = canvas.height;
-      const g = gameRef.current;
 
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, w, h);
+      if (g.keys.left) g.paddleX = Math.max(12, g.paddleX - 7);
+      if (g.keys.right) g.paddleX = Math.min(w - g.paddleW - 12, g.paddleX + 7);
 
-      if (gameState === 'playing') {
-        if (g.keys.left) g.paddleX = Math.max(12, g.paddleX - 7);
-        if (g.keys.right) g.paddleX = Math.min(w - g.paddleW - 12, g.paddleX + 7);
+      g.ballX += g.vx;
+      g.ballY += g.vy;
 
-        g.ballX += g.vx;
-        g.ballY += g.vy;
+      if (g.ballX - g.ballR <= 4) {
+        g.ballX = 4 + g.ballR;
+        g.vx = Math.abs(g.vx);
+      } else if (g.ballX + g.ballR >= w - 4) {
+        g.ballX = w - 4 - g.ballR;
+        g.vx = -Math.abs(g.vx);
+      }
+      if (g.ballY - g.ballR <= 4) {
+        g.ballY = 4 + g.ballR;
+        g.vy = Math.abs(g.vy);
+      }
 
-        if (g.ballX - g.ballR <= 4) {
-          g.ballX = 4 + g.ballR;
-          g.vx = Math.abs(g.vx);
-        } else if (g.ballX + g.ballR >= w - 4) {
-          g.ballX = w - 4 - g.ballR;
-          g.vx = -Math.abs(g.vx);
-        }
-        if (g.ballY - g.ballR <= 4) {
-          g.ballY = 4 + g.ballR;
-          g.vy = Math.abs(g.vy);
-        }
+      const paddleTop = h - 34;
+      if (
+        g.vy > 0 &&
+        g.ballY + g.ballR >= paddleTop &&
+        g.ballY - g.ballR <= paddleTop + g.paddleH &&
+        g.ballX >= g.paddleX - 4 &&
+        g.ballX <= g.paddleX + g.paddleW + 4
+      ) {
+        const hitOffset = (g.ballX - (g.paddleX + g.paddleW / 2)) / (g.paddleW / 2);
+        g.vx = hitOffset * 5.4;
+        g.vy = -Math.max(3.8, Math.abs(g.vy));
+        g.ballY = paddleTop - g.ballR - 1;
+      }
 
-        const paddleTop = h - 34;
+      for (let i = 0; i < g.bricks.length; i++) {
+        const b = g.bricks[i];
+        if (!b.alive) continue;
         if (
-          g.vy > 0 &&
-          g.ballY + g.ballR >= paddleTop &&
-          g.ballY - g.ballR <= paddleTop + g.paddleH &&
-          g.ballX >= g.paddleX - 4 &&
-          g.ballX <= g.paddleX + g.paddleW + 4
+          g.ballX + g.ballR > b.x &&
+          g.ballX - g.ballR < b.x + b.w &&
+          g.ballY + g.ballR > b.y &&
+          g.ballY - g.ballR < b.y + b.h
         ) {
-          const hitOffset = (g.ballX - (g.paddleX + g.paddleW / 2)) / (g.paddleW / 2);
-          g.vx = hitOffset * 5.4;
-          g.vy = -Math.max(3.8, Math.abs(g.vy));
-          g.ballY = paddleTop - g.ballR - 1;
-        }
-
-        for (let i = 0; i < g.bricks.length; i++) {
-          const b = g.bricks[i];
-          if (!b.alive) continue;
-          if (
-            g.ballX + g.ballR > b.x &&
-            g.ballX - g.ballR < b.x + b.w &&
-            g.ballY + g.ballR > b.y &&
-            g.ballY - g.ballR < b.y + b.h
-          ) {
-            b.alive = false;
-            g.vy = -g.vy;
-            for (let p = 0; p < 7; p++) {
-              g.particles.push({
-                x: b.x + b.w / 2,
-                y: b.y + b.h / 2,
-                vx: (Math.random() - 0.5) * 5,
-                vy: (Math.random() - 0.5) * 5,
-                life: 1,
-                color: b.color
-              });
-            }
-            const remaining = g.bricks.filter((br) => br.alive).length;
-            setBricksLeft(remaining);
-            setScore((s) => s + 10);
-            if (remaining === 0) {
-              setGameState('won');
-            }
-            break;
+          b.alive = false;
+          g.vy = -g.vy;
+          for (let p = 0; p < 7; p++) {
+            g.particles.push({
+              x: b.x + b.w / 2,
+              y: b.y + b.h / 2,
+              vx: (Math.random() - 0.5) * 5,
+              vy: (Math.random() - 0.5) * 5,
+              life: 1,
+              color: b.color
+            });
           }
-        }
-
-        if (g.ballY - g.ballR > h) {
-          setLives((prevLives) => {
-            const nextLives = prevLives - 1;
-            if (nextLives <= 0) {
-              setGameState('gameover');
-            } else {
-              g.ballX = g.paddleX + g.paddleW / 2;
-              g.ballY = h - 78;
-              g.vx = 4 * (Math.random() > 0.5 ? 1 : -1);
-              g.vy = -4.2;
-            }
-            return nextLives;
-          });
+          g.bricksAlive -= 1;
+          g.score += 10;
+          setBricksLeft(g.bricksAlive);
+          setScore(g.score);
+          if (g.bricksAlive <= 0) {
+            g.status = 'won';
+            setGameState('won');
+          }
+          break;
         }
       }
 
-      g.bricks.forEach((b) => {
-        if (!b.alive) return;
-        ctx.fillStyle = b.color;
-        ctx.fillRect(b.x, b.y, b.w, b.h);
-      });
-
-      for (let i = g.particles.length - 1; i >= 0; i--) {
-        const pt = g.particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.vy += 0.12;
-        pt.life -= 0.04;
-        if (pt.life <= 0) {
-          g.particles.splice(i, 1);
-          continue;
+      if (g.ballY - g.ballR > h) {
+        g.lives -= 1;
+        const currentLives = g.lives;
+        setLives(currentLives);
+        if (currentLives <= 0) {
+          g.status = 'gameover';
+          setGameState('gameover');
+        } else {
+          g.ballX = g.paddleX + g.paddleW / 2;
+          g.ballY = h - 78;
+          g.vx = 4 * (Math.random() > 0.5 ? 1 : -1);
+          g.vy = -4.2;
         }
-        ctx.globalAlpha = Math.max(0, pt.life);
-        ctx.fillStyle = pt.color;
-        ctx.fillRect(pt.x, pt.y, 3, 3);
-        ctx.globalAlpha = 1;
       }
 
-      ctx.fillStyle = '#E5E5E5';
-      ctx.beginPath();
-      ctx.roundRect(g.paddleX, h - 34, g.paddleW, g.paddleH, 5);
-      ctx.fill();
+      drawGame(ctx, w, h, g);
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath();
-      ctx.arc(g.ballX, g.ballY, g.ballR, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (gameState === 'playing') {
+      if (g.status === 'playing') {
         rafId = requestAnimationFrame(renderFrame);
       }
     };
 
-    renderFrame();
+    rafId = requestAnimationFrame(renderFrame);
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [gameState]);
+  }, [gameState, drawGame]);
 
   const handleCanvasPointerMove = (e) => {
     const canvas = canvasRef.current;
@@ -1259,6 +1326,7 @@ export default function App() {
                     if (gameState === 'gameover' || gameState === 'won') {
                       initGameCanvas(true);
                     } else {
+                      gameRef.current.status = 'playing';
                       setGameState('playing');
                     }
                   }}
@@ -1270,6 +1338,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => {
+                    gameRef.current.status = 'paused';
                     setGameState('paused');
                   }}
                   className="px-6 py-2 rounded-lg border border-white/40 font-mono text-xs uppercase tracking-widest text-white"
