@@ -11,11 +11,10 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 ## ✨ Key Features
 
 - **🎨 WebGL2 Particle & Mosaic Portrait:** Interactive GPU shader that dissolves and animates particles based on cursor physics and scroll state.
-- **⚡ Kinetic Preloader & Wordmark Animations:** Fluid GSAP timelines with animated split-screen transitions and sound-enhanced interactions.
+- **⚡ Kinetic Preloader & Wordmark Animations:** Fluid GSAP timelines with animated letter transitions.
 - **🎮 Built-In Arcade Minigame:** Interactive retro brick-breaker canvas game embedded directly into the layout.
 - **💼 Selected Works & Architecture Modals:** Deep dive into featured systems (*Veribyte* document verification & *CyberScope* fraud-detection engine) with architectural highlights.
-- **⚙️ Live Portfolio Customizer:** In-browser panel allowing real-time edits to name, bio, arcade words, and accent colors with one-click `portfolio.config.ts` export.
-- **📬 Contact & Quick Brief Form:** Interactive contact drawer with email copy trigger and contact submission handler.
+- **📬 Contact & Quick Brief Form:** Interactive contact brief modal with email copy trigger and form submission handler.
 - **📱 Fully Responsive Design:** Sleek dark-mode aesthetic, customized typography (Inter, Playfair Display, JetBrains Mono), and subtle film-grain overlay.
 
 ---
@@ -73,16 +72,17 @@ portfolio-website/
 ├── public/                 # Static assets
 │   ├── assets/             # Project screenshots & cutout textures
 │   │   ├── cyberscope.png
-│   │   ├── portrait.jpg
+│   │   ├── cyberscope.webp
 │   │   ├── portrait_cutout.webp
-│   │   └── veribyte.png
+│   │   ├── veribyte.png
+│   │   └── veribyte.webp
 │   └── favicon.svg         # SVG favicon
 ├── src/
 │   ├── components/
 │   │   ├── HeroWebGL.jsx         # WebGL2 interactive particle & mosaic shader
 │   │   └── PreloaderWordmark.jsx # Kinetic preloader animation
 │   ├── config/
-│   │   └── portfolio.config.ts   # Centralized portfolio data, metrics & copy
+│   │   └── portfolio.config.ts   # Centralized portfolio data & copy
 │   ├── App.jsx             # Main application and interactive UI sections
 │   └── main.jsx            # React root mount
 ├── .env.example            # Environment variables template
@@ -100,8 +100,6 @@ All personal details, project cards, tech stack tags, and accent colors can be c
 ```text
 src/config/portfolio.config.ts
 ```
-
-Alternatively, open the live website in development and launch the **Live Portfolio Customizer** modal to adjust information in real-time and export the updated configuration file.
 
 ---
 
