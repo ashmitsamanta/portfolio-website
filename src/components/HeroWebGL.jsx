@@ -128,8 +128,8 @@ const ATLAS_CROPS = [
 ];
 
 const DEFAULT_PROJECT_IMAGES = [
-  '/assets/veribyte.png',
-  '/assets/cyberscope.png'
+  '/assets/veribyte.webp',
+  '/assets/cyberscope.webp'
 ];
 
 function compileShader(gl, type, source) {
