@@ -274,11 +274,19 @@ export default function App() {
   }, [initGameCanvas, gameState]);
 
   useEffect(() => {
+    const isFormElement = (target) => {
+      if (!target || !target.tagName) return false;
+      const tag = target.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    };
+
     const down = (e) => {
+      if (isFormElement(e.target)) return;
       if (e.key === 'ArrowLeft') gameRef.current.keys.left = true;
       if (e.key === 'ArrowRight') gameRef.current.keys.right = true;
     };
     const up = (e) => {
+      if (isFormElement(e.target)) return;
       if (e.key === 'ArrowLeft') gameRef.current.keys.left = false;
       if (e.key === 'ArrowRight') gameRef.current.keys.right = false;
     };
