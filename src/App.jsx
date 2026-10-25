@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -17,6 +17,7 @@ import {
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
+import { initScrollAnimations, refreshScrollTrigger } from './animations/scrollAnimations';
 
 // 5x5 bitmap font for the Canvas Brick Breaker ("HELLO WORLD")
 const PIXEL_FONT = {
@@ -65,6 +66,7 @@ export default function App() {
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
   const heroSectionRef = useRef(null);
   const portraitAnchorRef = useRef(null);
+  const rootRef = useRef(null);
 
   // Navigation & UI state
   const [activeNav, setActiveNav] = useState('home');
@@ -142,6 +144,8 @@ export default function App() {
   const handleSlideDown = useCallback(() => {
     setHeroControlsVisible(true);
   }, []);
+
+
 
 
   // Track scroll position for navbar transparency transition
@@ -451,6 +455,15 @@ export default function App() {
       ? config.projects
       : config.projects.filter((p) => p.category === projectFilter);
 
+  // Initialize and refresh scroll-driven animations when preloader finishes or project list changes
+  useLayoutEffect(() => {
+    if (!heroControlsVisible) return;
+    const cleanup = initScrollAnimations(rootRef.current);
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [heroControlsVisible, filteredProjects]);
+
   const visibleStackCategories =
     selectedStackCat === 'all'
       ? config.stackCategories
@@ -544,6 +557,7 @@ export default function App() {
 
   return (
     <div
+      ref={rootRef}
       className="min-h-screen bg-[#000000] text-[#F2EFE9] selection:bg-[#FF5C3D] selection:text-black relative overflow-x-hidden font-sans"
       style={{ '--accent': config.accentColor }}
     >
@@ -797,16 +811,25 @@ export default function App() {
       <section id="about" className="max-w-7xl mx-auto px-4 sm:px-8 py-24 border-t border-white/[0.08]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-5">
-            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-neutral-500 mb-3">
+            <div
+              data-reveal="copy"
+              className="font-mono text-[11px] uppercase tracking-[0.28em] text-neutral-500 mb-3"
+            >
               ABOUT ME
             </div>
-            <h2 className="metallic-wordmark text-6xl sm:text-8xl md:text-[112px] font-black tracking-tighter leading-none select-none">
-              Intro
-            </h2>
+            <div className="overflow-hidden pb-2">
+              <h2
+                data-reveal="heading"
+                className="metallic-wordmark text-6xl sm:text-8xl md:text-[112px] font-black tracking-tighter leading-none select-none"
+              >
+                Intro
+              </h2>
+            </div>
           </div>
 
           <div className="lg:col-span-7">
             <div
+              data-reveal="copy"
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 setIntroGlow({
@@ -948,11 +971,16 @@ export default function App() {
           - 6 rows (01-06) with warm cream hover fill (`hover:bg-[#E2DDD2] hover:text-black`) exactly like t=11.20s */}
       <section id="service" className="max-w-7xl mx-auto px-4 sm:px-8 py-20 border-t border-white/[0.08]">
         <div className="mb-12 flex justify-end">
-          <h2 className="metallic-wordmark text-5xl sm:text-7xl font-black uppercase tracking-tighter leading-[0.9] text-right">
-            WHAT WE
-            <br />
-            CAN DO
-          </h2>
+          <div className="overflow-hidden pb-2">
+            <h2
+              data-reveal="heading"
+              className="metallic-wordmark text-5xl sm:text-7xl font-black uppercase tracking-tighter leading-[0.9] text-right"
+            >
+              WHAT WE
+              <br />
+              CAN DO
+            </h2>
+          </div>
         </div>
 
         <div className="border-t border-b border-white/10">
@@ -1057,15 +1085,29 @@ export default function App() {
           - Below: 4 Alternating Left/Right Split-Screen Showcase Rows */}
       <section id="project" className="max-w-7xl mx-auto px-4 sm:px-8 py-24 border-t border-white/[0.08]">
         <div className="mb-20">
-          <div className="flex items-baseline gap-3">
-            <span className="relative text-4xl sm:text-6xl font-black uppercase tracking-tight text-white">
-              SELECTED
-              <span className="absolute left-0 right-0 top-1/2 h-[3px] bg-white" />
+          <h2
+            data-reveal="heading"
+            aria-label="SELECTED work"
+            className="flex items-baseline gap-3"
+          >
+            <span className="overflow-hidden inline-block pb-2">
+              <span
+                data-reveal="heading-base"
+                className="relative text-4xl sm:text-6xl font-black uppercase tracking-tight text-white inline-block"
+              >
+                SELECTED
+                <span className="absolute left-0 right-0 top-1/2 h-[3px] bg-white" />
+              </span>
             </span>
-            <span className="text-4xl sm:text-6xl font-serif italic font-normal text-neutral-200">
-              work
+            <span className="overflow-hidden inline-block pb-2">
+              <span
+                data-reveal="italic"
+                className="text-4xl sm:text-6xl font-serif italic font-normal text-neutral-200 inline-block"
+              >
+                work
+              </span>
             </span>
-          </div>
+          </h2>
         </div>
 
         {/* Alternating Split-Screen Project Rows */}
@@ -1075,6 +1117,7 @@ export default function App() {
             return (
               <div
                 key={proj.id}
+                data-reveal="card"
                 className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               >
                 <div
@@ -1082,18 +1125,21 @@ export default function App() {
                     imageOnLeft ? 'lg:order-1' : 'lg:order-2'
                   }`}
                 >
-                  <div
-                    onClick={() => {
-                      setActiveProjectModal(proj);
-                    }}
-                    className="group relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#0B0B0B] border border-white/10 cursor-pointer"
-                  >
-                    <img
-                      src={proj.image}
-                      alt={`${proj.titlePrefix} ${proj.titleSuffix}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <div data-card-parallax className="h-full">
+                    <div
+                      onClick={() => {
+                        setActiveProjectModal(proj);
+                      }}
+                      className="group relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#0B0B0B] border border-white/10 cursor-pointer"
+                    >
+                      <img
+                        data-card-image
+                        src={proj.image}
+                        alt={`${proj.titlePrefix} ${proj.titleSuffix}`}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    </div>
                   </div>
                 </div>
 
@@ -1102,11 +1148,11 @@ export default function App() {
                     imageOnLeft ? 'lg:order-2' : 'lg:order-1'
                   }`}
                 >
-                  <div className="font-mono text-xs text-neutral-500">
+                  <div data-card-num className="font-mono text-xs text-neutral-500">
                     {proj.num || `0${idx + 1}`}
                   </div>
 
-                  <h3 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
+                  <h3 data-card-title className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
                     {proj.titlePrefix}
                     {proj.titlePrefix?.endsWith('-') || proj.noTitleSpace ? '' : ' '}
                     {proj.titleItalic && (
@@ -1118,11 +1164,11 @@ export default function App() {
                     {proj.titleSuffix}
                   </h3>
 
-                  <p className="text-sm sm:text-base text-neutral-400 leading-relaxed">
+                  <p data-card-desc className="text-sm sm:text-base text-neutral-400 leading-relaxed">
                     {proj.description}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <div data-card-buttons className="flex flex-wrap items-center gap-3 pt-2">
                     {proj.primaryLabel && proj.primaryUrl && (
                       <a
                         href={proj.primaryUrl}
@@ -1254,16 +1300,24 @@ export default function App() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-300">
+              <div
+                data-reveal="copy"
+                className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-300"
+              >
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>AVAILABLE FOR WORK</span>
               </div>
 
-              <h2 className="metallic-wordmark text-5xl sm:text-7xl font-black tracking-tight leading-none">
-                Get in touch
-              </h2>
+              <div className="overflow-hidden pb-2">
+                <h2
+                  data-reveal="heading"
+                  className="metallic-wordmark text-5xl sm:text-7xl font-black tracking-tight leading-none"
+                >
+                  Get in touch
+                </h2>
+              </div>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div data-reveal="copy" className="flex flex-wrap items-center gap-3 pt-2">
                 <a
                   href={`mailto:${config.socials.email}`}
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white text-black font-sans text-xs sm:text-sm font-bold tracking-wide hover:opacity-90 transition-opacity"
@@ -1286,7 +1340,10 @@ export default function App() {
             </div>
 
             <div className="lg:col-span-6">
-              <div className="rounded-3xl bg-[#121212]/80 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 space-y-6 shadow-2xl">
+              <div
+                data-reveal="copy"
+                className="rounded-3xl bg-[#121212]/80 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 space-y-6 shadow-2xl"
+              >
                 <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
                   <div>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-1">
