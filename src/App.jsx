@@ -2,27 +2,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ArrowUpRight,
   ArrowDownLeft,
-  ArrowDownRight,
-  Sparkles,
   Check,
   Copy,
   Pause,
   RotateCcw,
-  Sliders,
   X,
-  ChevronDown,
   Github,
   Linkedin,
   Mail,
-  MapPin,
-  MessageCircle,
-  Download,
   Send,
   ArrowUp,
-  ExternalLink,
   Eye
 } from 'lucide-react';
-import gsap from 'gsap';
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
@@ -87,13 +78,8 @@ export default function App() {
 
   const [introRunId, setIntroRunId] = useState(0);
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
-  const [revealVal, setRevealVal] = useState(0);
-  const revealObjRef = useRef({ reveal: 0 });
-  const maxSettleTimeRef = useRef(3.2);
   const heroSectionRef = useRef(null);
   const portraitAnchorRef = useRef(null);
-  const [particleCountLabel, setParticleCountLabel] = useState(0);
-
 
   // Navigation & UI state
   const [activeNav, setActiveNav] = useState('home');
@@ -169,11 +155,6 @@ export default function App() {
     [showToast]
   );
 
-  const replayIntroAnimation = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setHeroControlsVisible(false);
-    setIntroRunId((n) => n + 1);
-  }, []);
 
   const handleSlideDown = useCallback(() => {
     setHeroControlsVisible(true);
