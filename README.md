@@ -1,6 +1,6 @@
 # ⚡ Ashmit Samanta — Interactive Portfolio
 
-A modern, high-performance, interactive developer portfolio built with **React**, **Vite**, **Tailwind CSS**, **WebGL2**, and **GSAP**. Features GPU-accelerated particle shaders, kinetic typography, an interactive arcade minigame, and project deep-dives.
+A modern, interactive developer portfolio built with **React**, **Vite**, **Tailwind CSS**, **WebGL2**, and **GSAP**. Features GPU-accelerated particle shaders, kinetic typography, an interactive arcade minigame, and project deep-dives.
 
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
