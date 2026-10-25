@@ -61,8 +61,22 @@ export default function PreloaderWordmark({
       }
     }
 
-    // Measure letter coordinates relative to wordmark container after DOM settles
-    const timer = setTimeout(() => {
+    // Measure letter coordinates relative to wordmark container after fonts & DOM settle
+    let cancelled = false;
+    let timerId;
+
+    const fontReadyPromise = typeof document !== 'undefined' && document.fonts && document.fonts.ready
+      ? document.fonts.ready
+      : Promise.resolve();
+
+    const timeoutPromise = new Promise((resolve) => {
+      timerId = setTimeout(resolve, 1500);
+    });
+
+    Promise.race([fontReadyPromise, timeoutPromise]).then(() => {
+      if (cancelled) return;
+      clearTimeout(timerId);
+
       const parentBox = wordmark.getBoundingClientRect();
       const dotW = 14;
 
@@ -198,10 +212,11 @@ export default function PreloaderWordmark({
           if (onCompleteRef.current) onCompleteRef.current();
         }
       });
-    }, 150);
+    });
 
     return () => {
-      clearTimeout(timer);
+      cancelled = true;
+      clearTimeout(timerId);
       gsap.killTweensOf([dot, wordmark, ...letterRefs.current]);
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
