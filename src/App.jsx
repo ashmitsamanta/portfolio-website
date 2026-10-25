@@ -616,6 +616,39 @@ export default function App() {
     g.paddleX = Math.max(12, Math.min(cssWidth - g.paddleW - 12, relX - g.paddleW / 2));
   };
 
+  // Auto-pause (status 'paused', no reset) when #game is less than 20% visible or tab is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && gameRef.current.status === 'playing') {
+        gameRef.current.status = 'paused';
+        setGameState('paused');
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const gameSection = document.getElementById('game');
+    let observer;
+    if (gameSection && typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.intersectionRatio < 0.2 && gameRef.current.status === 'playing') {
+              gameRef.current.status = 'paused';
+              setGameState('paused');
+            }
+          }
+        },
+        { threshold: [0, 0.2] }
+      );
+      observer.observe(gameSection);
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
   // Filtered projects & stack items
   const filteredProjects =
     projectFilter === 'All'
