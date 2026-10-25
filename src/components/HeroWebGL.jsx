@@ -436,6 +436,7 @@ export default function HeroWebGL({
       if (!portraitImg) return;
       const anchorBox = anchor.getBoundingClientRect();
       const anchorW = anchorBox.width;
+      // Confirmed: returns early if anchor width is unchanged (< 1px delta)
       if (anchorW < 10 || Math.abs(anchorW - lastSampledW) < 1) return;
       lastSampledW = anchorW;
 
