@@ -82,30 +82,163 @@ function setupDesktopAnimations(rootEl) {
 }
 
 function setupMobileAnimations(rootEl) {
-  const targets = rootEl.querySelectorAll('[data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"]');
-  targets.forEach((el) => {
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: 16 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: DURATION,
-        ease: EASE,
-        scrollTrigger: {
-          trigger: el,
-          start: START,
-          once: true
-        }
+  const headings = rootEl.querySelectorAll('[data-reveal="heading"]');
+
+  headings.forEach((heading) => {
+    const triggerEl = heading.closest('.overflow-hidden') || heading.parentElement || heading;
+    const section = heading.closest('section');
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerEl,
+        start: START,
+        once: true
       }
-    );
+    });
+
+    const baseWord = heading.querySelector('[data-reveal="heading-base"]');
+    const italicWord = heading.querySelector('[data-reveal="italic"]');
+
+    if (baseWord && italicWord) {
+      tl.fromTo(
+        baseWord,
+        { yPercent: 105, opacity: 0 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: DURATION,
+          ease: EASE
+        },
+        0
+      );
+      tl.fromTo(
+        italicWord,
+        { yPercent: 105, opacity: 0 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: DURATION,
+          ease: EASE
+        },
+        STAGGER
+      );
+    } else {
+      tl.fromTo(
+        heading,
+        { yPercent: 105, opacity: 0 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: DURATION,
+          ease: EASE
+        },
+        0
+      );
+    }
+
+    if (section) {
+      const copyEls = section.querySelectorAll('[data-reveal="copy"]');
+      if (copyEls && copyEls.length > 0) {
+        tl.fromTo(
+          copyEls,
+          { opacity: 0, y: 16 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: DURATION,
+            ease: EASE,
+            stagger: STAGGER
+          },
+          STAGGER
+        );
+      }
+    }
   });
+
+  // Mobile card animations handled in Phase 2
+  setupCardsMobile(rootEl);
 }
 
 function setupHeadingsDesktop(rootEl) {
-  // Handled in Phase 1
+  const headings = rootEl.querySelectorAll('[data-reveal="heading"]');
+
+  headings.forEach((heading) => {
+    const triggerEl = heading.closest('.overflow-hidden') || heading.parentElement || heading;
+    const section = heading.closest('section');
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerEl,
+        start: START,
+        once: true
+      }
+    });
+
+    const baseWord = heading.querySelector('[data-reveal="heading-base"]');
+    const italicWord = heading.querySelector('[data-reveal="italic"]');
+
+    if (baseWord && italicWord) {
+      // Split heading: base part slides up at 0
+      tl.fromTo(
+        baseWord,
+        { yPercent: 105 },
+        {
+          yPercent: 0,
+          duration: DURATION,
+          ease: EASE
+        },
+        0
+      );
+      // Italic serif word starts STAGGER later
+      tl.fromTo(
+        italicWord,
+        { yPercent: 105 },
+        {
+          yPercent: 0,
+          duration: DURATION,
+          ease: EASE
+        },
+        STAGGER
+      );
+    } else {
+      // Entire h2 animated as one unit to preserve .metallic-wordmark background-clip:text gradient
+      tl.fromTo(
+        heading,
+        { yPercent: 105 },
+        {
+          yPercent: 0,
+          duration: DURATION,
+          ease: EASE
+        },
+        0
+      );
+    }
+
+    // Copy and buttons beside or under the heading in this section
+    if (section) {
+      const copyEls = section.querySelectorAll('[data-reveal="copy"]');
+      if (copyEls && copyEls.length > 0) {
+        tl.fromTo(
+          copyEls,
+          { opacity: 0, y: 16 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: DURATION,
+            ease: EASE,
+            stagger: STAGGER
+          },
+          STAGGER
+        );
+      }
+    }
+  });
 }
 
 function setupCardsDesktop(rootEl) {
+  // Handled in Phase 2
+}
+
+function setupCardsMobile(rootEl) {
   // Handled in Phase 2
 }
