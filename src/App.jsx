@@ -17,6 +17,7 @@ import {
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
+import ScrubText from './components/ScrubText';
 import { initScrollAnimations, refreshScrollTrigger } from './animations/scrollAnimations';
 
 // 5x5 bitmap font for the Canvas Brick Breaker ("HELLO WORLD")
@@ -817,7 +818,7 @@ export default function App() {
             >
               ABOUT ME
             </div>
-            <div className="overflow-hidden pb-2">
+            <div data-intro-parallax className="overflow-hidden pb-2">
               <h2
                 data-reveal="heading"
                 className="metallic-wordmark text-6xl sm:text-8xl md:text-[112px] font-black tracking-tighter leading-none select-none"
@@ -829,7 +830,7 @@ export default function App() {
 
           <div className="lg:col-span-7">
             <div
-              data-reveal="copy"
+              data-bio-card
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 setIntroGlow({
@@ -846,7 +847,7 @@ export default function App() {
                 }}
               />
               <p className="relative z-10 text-base sm:text-lg leading-relaxed text-neutral-300">
-                {config.personal.bio}
+                <ScrubText text={config.personal.bio} />
               </p>
             </div>
           </div>

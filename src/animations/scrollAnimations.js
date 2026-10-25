@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
 // Tunable animation constants
@@ -14,6 +15,13 @@ export const DIM_OPACITY = 0.3;
 export const START = 'top 85%';
 export const END = 'top 40%';
 export const PARALLAX_PX = 40;
+
+// Effect A - About / Intro Bio constants
+export const WORD_DIM = 0.18;
+export const WORD_STAGGER = 0.08;
+export const BIO_START = 'top 80%';
+export const BIO_END = 'top 35%';
+export const ENABLE_EXIT = false;
 
 /**
  * Refreshes ScrollTrigger instances (e.g. on font load or project filter changes).
@@ -47,7 +55,7 @@ export function initScrollAnimations(rootEl) {
     // 1. (prefers-reduced-motion: reduce): create NO animations; everything is visible and static.
     mm.add('(prefers-reduced-motion: reduce)', () => {
       gsap.set(
-        '[data-reveal], [data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"], [data-reveal="heading-base"], [data-reveal="italic"], [data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax]',
+        '[data-reveal], [data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"], [data-reveal="heading-base"], [data-reveal="italic"], [data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax], [data-scrub-word], [data-bio-card], [data-intro-parallax]',
         {
           opacity: 1,
           x: 0,
@@ -73,6 +81,9 @@ export function initScrollAnimations(rootEl) {
       }
       setupMobileAnimations(rootEl);
     });
+
+    // Bio word illumination (Effect A runs at all screen widths)
+    setupBioScrub(rootEl);
   }, rootEl);
 
   return () => {
@@ -317,3 +328,73 @@ function setupCardsMobile(rootEl) {
     );
   });
 }
+
+function setupBioScrub(rootEl) {
+  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  const bioSection = rootEl.querySelector('#about');
+  if (!bioSection) return;
+
+  const words = bioSection.querySelectorAll('[data-scrub-word]');
+  const bioCard = bioSection.querySelector('[data-bio-card]');
+  const introParallax = bioSection.querySelector('[data-intro-parallax]');
+
+  if (words.length > 0) {
+    // In useLayoutEffect (no flash before first paint) set all [data-scrub-word] to opacity WORD_DIM
+    gsap.set(words, { opacity: WORD_DIM });
+    if (bioCard) {
+      gsap.set(bioCard, { opacity: 0.5 });
+    }
+
+    const triggerEl = bioCard || bioSection;
+
+    // ONE timeline and ONE ScrollTrigger (not one per word): start BIO_START, end BIO_END, scrub SCRUB
+    const bioTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerEl,
+        start: BIO_START,
+        end: BIO_END,
+        scrub: SCRUB
+      }
+    });
+
+    // The rounded bio card scrubs from opacity ~0.5 to 1 over the same range. Keep its mouse-glow behavior exactly as is.
+    if (bioCard) {
+      bioTl.fromTo(bioCard, { opacity: 0.5 }, { opacity: 1, ease: 'none', duration: 1 }, 0);
+    }
+
+    // Small scrubbed parallax of yPercent about +-8 against the card on the "Intro" h2 mask wrapper
+    if (introParallax) {
+      bioTl.fromTo(introParallax, { yPercent: 8 }, { yPercent: -8, ease: 'none', duration: 1 }, 0);
+    }
+
+    // Tweening all words to opacity 1 with stagger WORD_STAGGER. No once, no toggleActions, no onLeave snapping.
+    bioTl.to(
+      words,
+      {
+        opacity: 1,
+        ease: 'none',
+        stagger: WORD_STAGGER
+      },
+      0
+    );
+
+    // If ENABLE_EXIT is true: when the section's bottom passes the top of the viewport (scrolling down), scrub the card to opacity 0.4 and y -30. Default false; tell me it exists.
+    if (ENABLE_EXIT && bioCard) {
+      gsap.to(bioCard, {
+        opacity: 0.4,
+        y: -30,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: bioSection,
+          start: 'bottom bottom',
+          end: 'bottom top',
+          scrub: SCRUB
+        }
+      });
+    }
+  }
+}
+
