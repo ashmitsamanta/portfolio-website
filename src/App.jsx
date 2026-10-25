@@ -241,7 +241,11 @@ export default function App() {
     [config.personal.gameWordTop, config.personal.gameWordBottom]
   );
 
-  const drawGame = useCallback((ctx, w, h, g) => {
+  const drawGame = useCallback((ctx, w, h, g, dtScale = 1) => {
+    const dpr = g.dpr || 1;
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, w, h);
 
@@ -254,10 +258,10 @@ export default function App() {
     for (let i = g.particles.length - 1; i >= 0; i--) {
       const pt = g.particles[i];
       if (g.status === 'playing') {
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.vy += 0.12;
-        pt.life -= 0.04;
+        pt.x += pt.vx * dtScale;
+        pt.y += pt.vy * dtScale;
+        pt.vy += 0.12 * dtScale;
+        pt.life -= 0.04 * dtScale;
       }
       if (pt.life <= 0) {
         g.particles.splice(i, 1);
@@ -292,6 +296,8 @@ export default function App() {
     ctx.beginPath();
     ctx.arc(g.ballX, g.ballY, g.ballR, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.restore();
   }, []);
 
   const initGameCanvas = useCallback(
@@ -303,10 +309,14 @@ export default function App() {
       const rect = parent.getBoundingClientRect();
       const w = Math.max(320, Math.floor(rect.width));
       const h = 420;
-      canvas.width = w;
-      canvas.height = h;
+
+      // HiDPI backing buffer: cap devicePixelRatio at 2
+      const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
 
       const bricks = buildWordBricks(w);
+      const cellSize = Math.max(7, Math.min(13, Math.floor((w - 120) / 42)));
       const initialStatus = startImmediately ? 'playing' : 'idle';
       const initialLives = 3;
       const initialScore = 0;
@@ -316,6 +326,10 @@ export default function App() {
         lives: initialLives,
         score: initialScore,
         bricksAlive: bricks.length,
+        w,
+        h,
+        dpr,
+        minCellSize: cellSize,
         paddleX: (w - 116) / 2,
         paddleW: 116,
         paddleH: 9,
@@ -336,7 +350,7 @@ export default function App() {
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        drawGame(ctx, w, h, gameRef.current);
+        drawGame(ctx, w, h, gameRef.current, 1);
       }
     },
     [buildWordBricks, drawGame]
@@ -370,29 +384,49 @@ export default function App() {
   }, [initGameCanvas]);
 
   useEffect(() => {
-    const isFormElement = (target) => {
-      if (!target || !target.tagName) return false;
-      const tag = target.tagName.toLowerCase();
-      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    const isFormOrEditable = (target) => {
+      if (!target) return false;
+      if (target.isContentEditable) return true;
+      if (target.tagName) {
+        const tag = target.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+      }
+      return false;
     };
 
     const down = (e) => {
-      if (isFormElement(e.target)) return;
-      if (e.key === 'ArrowLeft') gameRef.current.keys.left = true;
-      if (e.key === 'ArrowRight') gameRef.current.keys.right = true;
+      if (activeProjectModal || showContactFormModal) return;
+      if (isFormOrEditable(e.target)) return;
+
+      const isLeft = e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A';
+      const isRight = e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D';
+
+      if (gameRef.current.status === 'playing' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+      }
+
+      if (isLeft) gameRef.current.keys.left = true;
+      if (isRight) gameRef.current.keys.right = true;
     };
+
     const up = (e) => {
-      if (isFormElement(e.target)) return;
-      if (e.key === 'ArrowLeft') gameRef.current.keys.left = false;
-      if (e.key === 'ArrowRight') gameRef.current.keys.right = false;
+      if (activeProjectModal || showContactFormModal) return;
+      if (isFormOrEditable(e.target)) return;
+
+      const isLeft = e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A';
+      const isRight = e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D';
+
+      if (isLeft) gameRef.current.keys.left = false;
+      if (isRight) gameRef.current.keys.right = false;
     };
+
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
     };
-  }, []);
+  }, [activeProjectModal, showContactFormModal]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -400,101 +434,164 @@ export default function App() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const g = gameRef.current;
     if (gameState !== 'playing') {
-      drawGame(ctx, canvas.width, canvas.height, gameRef.current);
+      drawGame(ctx, g.w || canvas.width, g.h || 420, g, 1);
       return;
     }
 
     let rafId;
+    let lastTime = performance.now();
 
-    const renderFrame = () => {
-      const g = gameRef.current;
+    const renderFrame = (now) => {
       if (g.status !== 'playing') return;
 
-      const w = canvas.width;
-      const h = canvas.height;
+      const w = g.w || 320;
+      const h = g.h || 420;
 
-      if (g.keys.left) g.paddleX = Math.max(12, g.paddleX - 7);
-      if (g.keys.right) g.paddleX = Math.min(w - g.paddleW - 12, g.paddleX + 7);
+      // Delta-time in 60Hz units: 16.6667ms is 1 frame
+      const elapsed = now ? now - lastTime : 16.6667;
+      lastTime = now || performance.now();
+      // Clamp dt to at most 2 frames (~33.3ms) to prevent teleportation on tab switch
+      const dtScale = Math.min(2.0, Math.max(0.1, elapsed / 16.6667));
 
-      g.ballX += g.vx;
-      g.ballY += g.vy;
+      // Paddle keyboard move (7 px/frame at 60Hz, scaled by dtScale)
+      const paddleSpeed = 7 * dtScale;
+      if (g.keys.left) g.paddleX = Math.max(12, g.paddleX - paddleSpeed);
+      if (g.keys.right) g.paddleX = Math.min(w - g.paddleW - 12, g.paddleX + paddleSpeed);
 
-      if (g.ballX - g.ballR <= 4) {
-        g.ballX = 4 + g.ballR;
-        g.vx = Math.abs(g.vx);
-      } else if (g.ballX + g.ballR >= w - 4) {
-        g.ballX = w - 4 - g.ballR;
-        g.vx = -Math.abs(g.vx);
-      }
-      if (g.ballY - g.ballR <= 4) {
-        g.ballY = 4 + g.ballR;
-        g.vy = Math.abs(g.vy);
-      }
+      // Substepping for anti-tunneling
+      // Split each frame into up to 3 substeps when speed * dt exceeds half a brick
+      const speed = Math.hypot(g.vx, g.vy);
+      const totalDist = speed * dtScale;
+      const maxStepDist = (g.minCellSize || 7) / 2;
+      const substeps = Math.min(3, Math.max(1, Math.ceil(totalDist / maxStepDist)));
+      const stepScale = dtScale / substeps;
 
-      const paddleTop = h - 34;
-      if (
-        g.vy > 0 &&
-        g.ballY + g.ballR >= paddleTop &&
-        g.ballY - g.ballR <= paddleTop + g.paddleH &&
-        g.ballX >= g.paddleX - 4 &&
-        g.ballX <= g.paddleX + g.paddleW + 4
-      ) {
-        const hitOffset = (g.ballX - (g.paddleX + g.paddleW / 2)) / (g.paddleW / 2);
-        g.vx = hitOffset * 5.4;
-        g.vy = -Math.max(3.8, Math.abs(g.vy));
-        g.ballY = paddleTop - g.ballR - 1;
-      }
+      for (let s = 0; s < substeps; s++) {
+        g.ballX += g.vx * stepScale;
+        g.ballY += g.vy * stepScale;
 
-      for (let i = 0; i < g.bricks.length; i++) {
-        const b = g.bricks[i];
-        if (!b.alive) continue;
+        // Wall collisions
+        if (g.ballX - g.ballR <= 4) {
+          g.ballX = 4 + g.ballR;
+          g.vx = Math.abs(g.vx);
+        } else if (g.ballX + g.ballR >= w - 4) {
+          g.ballX = w - 4 - g.ballR;
+          g.vx = -Math.abs(g.vx);
+        }
+        if (g.ballY - g.ballR <= 4) {
+          g.ballY = 4 + g.ballR;
+          g.vy = Math.abs(g.vy);
+        }
+
+        // Paddle collision
+        const paddleTop = h - 34;
         if (
-          g.ballX + g.ballR > b.x &&
-          g.ballX - g.ballR < b.x + b.w &&
-          g.ballY + g.ballR > b.y &&
-          g.ballY - g.ballR < b.y + b.h
+          g.vy > 0 &&
+          g.ballY + g.ballR >= paddleTop &&
+          g.ballY - g.ballR <= paddleTop + g.paddleH &&
+          g.ballX >= g.paddleX - 4 &&
+          g.ballX <= g.paddleX + g.paddleW + 4
         ) {
-          b.alive = false;
-          g.vy = -g.vy;
-          for (let p = 0; p < 7; p++) {
-            g.particles.push({
-              x: b.x + b.w / 2,
-              y: b.y + b.h / 2,
-              vx: (Math.random() - 0.5) * 5,
-              vy: (Math.random() - 0.5) * 5,
-              life: 1,
-              color: b.color
-            });
+          const hitOffset = (g.ballX - (g.paddleX + g.paddleW / 2)) / (g.paddleW / 2);
+          g.vx = hitOffset * 5.4;
+          g.vy = -Math.max(3.8, Math.abs(g.vy));
+          g.ballY = paddleTop - g.ballR - 1;
+        }
+
+        // Brick collision: pick axis by penetration depth
+        for (let i = 0; i < g.bricks.length; i++) {
+          const b = g.bricks[i];
+          if (!b.alive) continue;
+
+          const bLeft = b.x;
+          const bRight = b.x + b.w;
+          const bTop = b.y;
+          const bBottom = b.y + b.h;
+
+          const ballLeft = g.ballX - g.ballR;
+          const ballRight = g.ballX + g.ballR;
+          const ballTop = g.ballY - g.ballR;
+          const ballBottom = g.ballY + g.ballR;
+
+          if (
+            ballRight > bLeft &&
+            ballLeft < bRight &&
+            ballBottom > bTop &&
+            ballTop < bBottom
+          ) {
+            b.alive = false;
+
+            const overlapLeft = ballRight - bLeft;
+            const overlapRight = bRight - ballLeft;
+            const overlapTop = ballBottom - bTop;
+            const overlapBottom = bBottom - ballTop;
+
+            const penX = Math.min(overlapLeft, overlapRight);
+            const penY = Math.min(overlapTop, overlapBottom);
+
+            if (penX < penY) {
+              // Lateral/side hit
+              g.vx = -g.vx;
+              if (overlapLeft < overlapRight) {
+                g.ballX = bLeft - g.ballR;
+              } else {
+                g.ballX = bRight + g.ballR;
+              }
+            } else {
+              // Top/bottom hit
+              g.vy = -g.vy;
+              if (overlapTop < overlapBottom) {
+                g.ballY = bTop - g.ballR;
+              } else {
+                g.ballY = bBottom + g.ballR;
+              }
+            }
+
+            for (let p = 0; p < 7; p++) {
+              g.particles.push({
+                x: b.x + b.w / 2,
+                y: b.y + b.h / 2,
+                vx: (Math.random() - 0.5) * 5,
+                vy: (Math.random() - 0.5) * 5,
+                life: 1,
+                color: b.color
+              });
+            }
+
+            g.bricksAlive -= 1;
+            g.score += 10;
+            setBricksLeft(g.bricksAlive);
+            setScore(g.score);
+
+            if (g.bricksAlive <= 0) {
+              g.status = 'won';
+              setGameState('won');
+            }
+            break; // Keep one brick destroyed per substep
           }
-          g.bricksAlive -= 1;
-          g.score += 10;
-          setBricksLeft(g.bricksAlive);
-          setScore(g.score);
-          if (g.bricksAlive <= 0) {
-            g.status = 'won';
-            setGameState('won');
+        }
+
+        // Miss / life lost check
+        if (g.ballY - g.ballR > h) {
+          g.lives -= 1;
+          const currentLives = g.lives;
+          setLives(currentLives);
+          if (currentLives <= 0) {
+            g.status = 'gameover';
+            setGameState('gameover');
+          } else {
+            g.ballX = g.paddleX + g.paddleW / 2;
+            g.ballY = h - 78;
+            g.vx = 4 * (Math.random() > 0.5 ? 1 : -1);
+            g.vy = -4.2;
           }
-          break;
+          break; // Stop remaining substeps on miss
         }
       }
 
-      if (g.ballY - g.ballR > h) {
-        g.lives -= 1;
-        const currentLives = g.lives;
-        setLives(currentLives);
-        if (currentLives <= 0) {
-          g.status = 'gameover';
-          setGameState('gameover');
-        } else {
-          g.ballX = g.paddleX + g.paddleW / 2;
-          g.ballY = h - 78;
-          g.vx = 4 * (Math.random() > 0.5 ? 1 : -1);
-          g.vy = -4.2;
-        }
-      }
-
-      drawGame(ctx, w, h, g);
+      drawGame(ctx, w, h, g, dtScale);
 
       if (g.status === 'playing') {
         rafId = requestAnimationFrame(renderFrame);
@@ -511,10 +608,12 @@ export default function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const relX = clientX - rect.left;
+    if (!rect.width) return;
     const g = gameRef.current;
-    g.paddleX = Math.max(12, Math.min(canvas.width - g.paddleW - 12, relX - g.paddleW / 2));
+    const cssWidth = g.w || rect.width;
+    const scale = cssWidth / rect.width;
+    const relX = (e.clientX - rect.left) * scale;
+    g.paddleX = Math.max(12, Math.min(cssWidth - g.paddleW - 12, relX - g.paddleW / 2));
   };
 
   // Filtered projects & stack items
@@ -1300,8 +1399,8 @@ export default function App() {
           <div className="relative w-full overflow-hidden bg-[#000000]">
             <canvas
               ref={canvasRef}
-              onMouseMove={handleCanvasPointerMove}
-              onTouchMove={handleCanvasPointerMove}
+              onPointerMove={handleCanvasPointerMove}
+              onPointerDown={handleCanvasPointerMove}
               className="w-full h-[420px] block cursor-ew-resize touch-none"
             />
           </div>
