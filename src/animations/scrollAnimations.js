@@ -46,12 +46,16 @@ export function initScrollAnimations(rootEl) {
 
     // 1. (prefers-reduced-motion: reduce): create NO animations; everything is visible and static.
     mm.add('(prefers-reduced-motion: reduce)', () => {
-      gsap.set('[data-reveal]', {
-        opacity: 1,
-        x: 0,
-        y: 0,
-        clearProps: 'transform,opacity'
-      });
+      gsap.set(
+        '[data-reveal], [data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"], [data-reveal="heading-base"], [data-reveal="italic"], [data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax]',
+        {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          yPercent: 0,
+          clearProps: 'all'
+        }
+      );
     });
 
     // 2. (min-width: 1024px): full scrubbed effects.
@@ -236,9 +240,80 @@ function setupHeadingsDesktop(rootEl) {
 }
 
 function setupCardsDesktop(rootEl) {
-  // Handled in Phase 2
+  const cards = rootEl.querySelectorAll('[data-reveal="card"]');
+
+  cards.forEach((card, idx) => {
+    const numEl = card.querySelector('[data-card-num]');
+    const titleEl = card.querySelector('[data-card-title]');
+    const descEl = card.querySelector('[data-card-desc]');
+    const buttonsEl = card.querySelector('[data-card-buttons]');
+    const imageEl = card.querySelector('[data-card-image]');
+    const parallaxEl = card.querySelector('[data-card-parallax]');
+
+    // One ScrollTrigger per card, scrubbed from START to END
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: card,
+        start: START,
+        end: END,
+        scrub: SCRUB
+      }
+    });
+
+    // Number and title scrub from opacity DIM_OPACITY to 1
+    if (numEl) {
+      tl.fromTo(numEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
+    }
+    if (titleEl) {
+      tl.fromTo(titleEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
+    }
+
+    // Description and buttons scrub with a slight delay, from DIM_OPACITY to 0.7 for description and 1 for buttons
+    if (descEl) {
+      tl.fromTo(descEl, { opacity: DIM_OPACITY }, { opacity: 0.7, ease: 'none', duration: 0.8 }, 0.2);
+    }
+    if (buttonsEl) {
+      tl.fromTo(buttonsEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.8 }, 0.2);
+    }
+
+    // Image panel scrubs from brightness-like dimming (opacity DIM_OPACITY to 1) and gentle vertical parallax +-PARALLAX_PX against text
+    if (imageEl) {
+      tl.fromTo(imageEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 1.0 }, 0);
+    }
+    if (parallaxEl) {
+      const py = idx % 2 === 0 ? PARALLAX_PX : -PARALLAX_PX;
+      tl.fromTo(parallaxEl, { y: py }, { y: -py, ease: 'none', duration: 1.0 }, 0);
+    }
+  });
 }
 
 function setupCardsMobile(rootEl) {
-  // Handled in Phase 2
+  const cards = rootEl.querySelectorAll('[data-reveal="card"]');
+
+  cards.forEach((card) => {
+    // Ensure inner elements default to full opacity on mobile
+    gsap.set(
+      card.querySelectorAll(
+        '[data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax]'
+      ),
+      { opacity: 1, y: 0, clearProps: 'transform,opacity' }
+    );
+
+    // Simplified, un-scrubbed fade-up (one-shot, once: true)
+    gsap.fromTo(
+      card,
+      { opacity: 0, y: 16 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: DURATION,
+        ease: EASE,
+        scrollTrigger: {
+          trigger: card,
+          start: START,
+          once: true
+        }
+      }
+    );
+  });
 }

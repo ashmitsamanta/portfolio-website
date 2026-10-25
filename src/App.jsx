@@ -145,14 +145,6 @@ export default function App() {
     setHeroControlsVisible(true);
   }, []);
 
-  // Initialize scroll-driven animations once preloader signals completion
-  useLayoutEffect(() => {
-    if (!heroControlsVisible) return;
-    const cleanup = initScrollAnimations(rootRef.current);
-    return () => {
-      if (cleanup) cleanup();
-    };
-  }, [heroControlsVisible]);
 
 
 
@@ -463,11 +455,14 @@ export default function App() {
       ? config.projects
       : config.projects.filter((p) => p.category === projectFilter);
 
-  // Refresh ScrollTrigger calculations whenever project list / filter changes
+  // Initialize and refresh scroll-driven animations when preloader finishes or project list changes
   useLayoutEffect(() => {
     if (!heroControlsVisible) return;
-    refreshScrollTrigger();
-  }, [filteredProjects, heroControlsVisible]);
+    const cleanup = initScrollAnimations(rootRef.current);
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [heroControlsVisible, filteredProjects]);
 
   const visibleStackCategories =
     selectedStackCat === 'all'
@@ -1122,6 +1117,7 @@ export default function App() {
             return (
               <div
                 key={proj.id}
+                data-reveal="card"
                 className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               >
                 <div
@@ -1129,18 +1125,21 @@ export default function App() {
                     imageOnLeft ? 'lg:order-1' : 'lg:order-2'
                   }`}
                 >
-                  <div
-                    onClick={() => {
-                      setActiveProjectModal(proj);
-                    }}
-                    className="group relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#0B0B0B] border border-white/10 cursor-pointer"
-                  >
-                    <img
-                      src={proj.image}
-                      alt={`${proj.titlePrefix} ${proj.titleSuffix}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <div data-card-parallax className="h-full">
+                    <div
+                      onClick={() => {
+                        setActiveProjectModal(proj);
+                      }}
+                      className="group relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#0B0B0B] border border-white/10 cursor-pointer"
+                    >
+                      <img
+                        data-card-image
+                        src={proj.image}
+                        alt={`${proj.titlePrefix} ${proj.titleSuffix}`}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    </div>
                   </div>
                 </div>
 
@@ -1149,11 +1148,11 @@ export default function App() {
                     imageOnLeft ? 'lg:order-2' : 'lg:order-1'
                   }`}
                 >
-                  <div className="font-mono text-xs text-neutral-500">
+                  <div data-card-num className="font-mono text-xs text-neutral-500">
                     {proj.num || `0${idx + 1}`}
                   </div>
 
-                  <h3 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
+                  <h3 data-card-title className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
                     {proj.titlePrefix}
                     {proj.titlePrefix?.endsWith('-') || proj.noTitleSpace ? '' : ' '}
                     {proj.titleItalic && (
@@ -1165,11 +1164,11 @@ export default function App() {
                     {proj.titleSuffix}
                   </h3>
 
-                  <p className="text-sm sm:text-base text-neutral-400 leading-relaxed">
+                  <p data-card-desc className="text-sm sm:text-base text-neutral-400 leading-relaxed">
                     {proj.description}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <div data-card-buttons className="flex flex-wrap items-center gap-3 pt-2">
                     {proj.primaryLabel && proj.primaryUrl && (
                       <a
                         href={proj.primaryUrl}
