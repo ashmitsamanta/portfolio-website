@@ -52,8 +52,8 @@ const PIXEL_FONT = {
 const DEFAULT_CONFIG = PORTFOLIO_CONFIG;
 
 const PROJECT_ATLAS_IMAGES = [
-  '/assets/veribyte.png',
-  '/assets/cyberscope.png'
+  '/assets/veribyte.webp',
+  '/assets/cyberscope.webp'
 ];
 
 const CONTACT_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';

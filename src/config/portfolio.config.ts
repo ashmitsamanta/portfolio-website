@@ -134,7 +134,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       titleSuffix: 'IDENTITY & DOCUMENT VERIFICATION',
       category: 'Web & AI',
       badge: '',
-      image: '/assets/veribyte.png',
+      image: '/assets/veribyte.webp',
       description: 'An AI-assisted identity and document verification platform, built with React, Vite, and a FastAPI backend with Supabase. Features OCR extraction (Tesseract, PassportEye), Verhoeff, PAN, and MRZ validators, ELA-based tamper detection, InsightFace face matching, a SigLIP deepfake check, and live SSE streaming of verification results.',
       detailsDescription: "An AI-assisted identity and document verification platform, built with React and Vite on a FastAPI backend with Supabase. Runs uploaded documents through OCR extraction, checksum validation, tamper detection, face matching, and a deepfake check, and streams each stage's result to the UI as it completes.",
       highlights: [
@@ -156,7 +156,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       titleSuffix: 'CYBER-FRAUD INTELLIGENCE PLATFORM',
       category: 'Web & Security',
       badge: 'Full-Stack Platform',
-      image: '/assets/cyberscope.png',
+      image: '/assets/cyberscope.webp',
       description: 'An explainable fraud intelligence platform that links messages, phone numbers, URLs, payment identifiers, and bank accounts into a single fraud graph. Built with FastAPI, SQLAlchemy, and NetworkX, with JWT authentication, rule-based risk scoring, recursive BFS fund tracing, and an LLM chat assistant. Ships with a 20-test pytest suite, a synthetic benchmark dataset, and Docker and Nginx deployment.',
       detailsDescription: 'An explainable fraud investigation platform that links scam messages, phone numbers, URLs, payment identifiers, and bank accounts into a single fraud graph. Built with a FastAPI backend, NetworkX graph engine, and a multi-page Vite frontend, with JWT authentication, transparent rule-based risk scoring, and recursive fund tracing across linked accounts.',
       highlights: [
