@@ -17,6 +17,7 @@ import {
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
+import ScrubText from './components/ScrubText';
 import { initScrollAnimations, refreshScrollTrigger } from './animations/scrollAnimations';
 
 // 5x5 bitmap font for the Canvas Brick Breaker ("HELLO WORLD")
@@ -601,6 +602,8 @@ export default function App() {
           mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
         }
         .liquid-marble-bg {
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
+          mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
           background:
             radial-gradient(ellipse 80% 50% at 20% 40%, rgba(255,255,255,0.06) 0%, transparent 60%),
             radial-gradient(ellipse 70% 60% at 80% 70%, rgba(255,255,255,0.05) 0%, transparent 55%),
@@ -817,7 +820,7 @@ export default function App() {
             >
               ABOUT ME
             </div>
-            <div className="overflow-hidden pb-2">
+            <div data-intro-parallax className="overflow-hidden pb-2">
               <h2
                 data-reveal="heading"
                 className="metallic-wordmark text-6xl sm:text-8xl md:text-[112px] font-black tracking-tighter leading-none select-none"
@@ -829,7 +832,7 @@ export default function App() {
 
           <div className="lg:col-span-7">
             <div
-              data-reveal="copy"
+              data-bio-card
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 setIntroGlow({
@@ -846,7 +849,7 @@ export default function App() {
                 }}
               />
               <p className="relative z-10 text-base sm:text-lg leading-relaxed text-neutral-300">
-                {config.personal.bio}
+                <ScrubText text={config.personal.bio} />
               </p>
             </div>
           </div>
@@ -1295,13 +1298,13 @@ export default function App() {
         id="contact"
         className="relative overflow-hidden border-t border-white/[0.08] py-24"
       >
-        <div className="pointer-events-none absolute inset-0 liquid-marble-bg opacity-90" />
+        <div data-contact-bg className="pointer-events-none absolute inset-0 liquid-marble-bg opacity-90" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 space-y-6">
               <div
-                data-reveal="copy"
+                data-contact-pill
                 className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-300"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -1317,7 +1320,7 @@ export default function App() {
                 </h2>
               </div>
 
-              <div data-reveal="copy" className="flex flex-wrap items-center gap-3 pt-2">
+              <div data-contact-buttons className="flex flex-wrap items-center gap-3 pt-2">
                 <a
                   href={`mailto:${config.socials.email}`}
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white text-black font-sans text-xs sm:text-sm font-bold tracking-wide hover:opacity-90 transition-opacity"
@@ -1341,10 +1344,10 @@ export default function App() {
 
             <div className="lg:col-span-6">
               <div
-                data-reveal="copy"
+                data-contact-card
                 className="rounded-3xl bg-[#121212]/80 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 space-y-6 shadow-2xl"
               >
-                <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
+                <div data-contact-row className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
                   <div>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-1">
                       EMAIL
@@ -1364,14 +1367,14 @@ export default function App() {
                 </div>
 
 
-                <div className="border-b border-white/[0.08] pb-5">
+                <div data-contact-row className="border-b border-white/[0.08] pb-5">
                   <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-1">
                     BASED IN
                   </div>
                   <div className="text-sm sm:text-base text-white">{config.personal.location}</div>
                 </div>
 
-                <div>
+                <div data-contact-row>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-3">
                     ELSEWHERE
                   </div>
@@ -1400,7 +1403,7 @@ export default function App() {
             </div>
           </div>
 
-          <footer className="mt-24 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-neutral-500">
+          <footer data-contact-footer className="mt-24 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-neutral-500">
             <div>
               © {new Date().getFullYear()} {config.personal.name}. All rights reserved.
             </div>
