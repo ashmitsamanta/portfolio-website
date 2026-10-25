@@ -482,12 +482,51 @@ export default function HeroWebGL({
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     document.addEventListener('pointerleave', onPointerLeave);
 
-    let isRunning = true;
-    let animId;
+    let running = false;
+    let animId = null;
+    let isVisible = !document.hidden;
+    let isIntersecting = true;
     const globalStartTime = performance.now() / 1000;
 
+    const startLoop = () => {
+      if (running || !isVisible || !isIntersecting) return;
+      running = true;
+      cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(render);
+    };
+
+    const stopLoop = () => {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(animId);
+      animId = null;
+    };
+
+    const updateRunningState = () => {
+      if (isVisible && isIntersecting) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    };
+
+    const onVisibilityChange = () => {
+      isVisible = !document.hidden;
+      updateRunningState();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry ? entry.isIntersecting : true;
+        updateRunningState();
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
     const render = () => {
-      if (!isRunning) return;
+      if (!running) return;
 
       if (!particleCount || startTimeRef.current === null) {
         gl.clearColor(0, 0, 0, 0);
@@ -550,11 +589,12 @@ export default function HeroWebGL({
       animId = requestAnimationFrame(render);
     };
 
-    animId = requestAnimationFrame(render);
+    startLoop();
 
     return () => {
-      isRunning = false;
-      cancelAnimationFrame(animId);
+      stopLoop();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      observer.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerleave', onPointerLeave);
       gl.deleteProgram(program);
