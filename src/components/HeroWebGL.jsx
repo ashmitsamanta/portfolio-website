@@ -516,6 +516,17 @@ export default function HeroWebGL({
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
 
+    const motionQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    let prefersReducedMotion = motionQuery ? motionQuery.matches : false;
+    const onMotionChange = (e) => {
+      prefersReducedMotion = e.matches;
+    };
+    if (motionQuery && motionQuery.addEventListener) {
+      motionQuery.addEventListener('change', onMotionChange);
+    } else if (motionQuery && motionQuery.addListener) {
+      motionQuery.addListener(onMotionChange);
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         isIntersecting = entry ? entry.isIntersecting : true;
@@ -550,9 +561,10 @@ export default function HeroWebGL({
 
       const anchorBox = anchor.getBoundingClientRect();
       const now = performance.now() / 1000;
+      const prefersReduced = prefersReducedMotion;
 
       // Authentic reference scroll scatter formula: -canvasBox.top / (canvasBox.height * 0.7)
-      const scrollScatter = Math.min(1.0, Math.max(0.0, -canvasBox.top / (canvasBox.height * 0.70)));
+      const scrollScatter = prefersReduced ? 0.0 : Math.min(1.0, Math.max(0.0, -canvasBox.top / (canvasBox.height * 0.70)));
 
       // Smooth pointer lerp
       mouse.x += (mouse.tx - mouse.x) * 0.18;
@@ -575,10 +587,10 @@ export default function HeroWebGL({
       );
       gl.uniform1f(loc.cell, cellPitch);
       gl.uniform1f(loc.dpr, dpr);
-      gl.uniform1f(loc.time, now - globalStartTime);
-      gl.uniform1f(loc.reveal, now - startTimeRef.current);
+      gl.uniform1f(loc.time, prefersReduced ? 0.0 : (now - globalStartTime));
+      gl.uniform1f(loc.reveal, prefersReduced ? 10.0 : (now - startTimeRef.current));
       gl.uniform1f(loc.scatter, scrollScatter);
-      gl.uniform2f(loc.mouse, mouse.x, mouse.y);
+      gl.uniform2f(loc.mouse, prefersReduced ? -9999.0 : mouse.x, prefersReduced ? -9999.0 : mouse.y);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
@@ -594,6 +606,11 @@ export default function HeroWebGL({
     return () => {
       stopLoop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      if (motionQuery && motionQuery.removeEventListener) {
+        motionQuery.removeEventListener('change', onMotionChange);
+      } else if (motionQuery && motionQuery.removeListener) {
+        motionQuery.removeListener(onMotionChange);
+      }
       observer.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerleave', onPointerLeave);
