@@ -23,6 +23,12 @@ export const BIO_START = 'top 80%';
 export const BIO_END = 'top 35%';
 export const ENABLE_EXIT = false;
 
+// Effect B - Contact Section constants
+export const CONTACT_START = 'top 75%';
+export const CONTACT_BG_START = 'top 100%';
+export const CONTACT_BG_END = 'top 40%';
+export const ROW_STAGGER = 0.06;
+
 /**
  * Refreshes ScrollTrigger instances (e.g. on font load or project filter changes).
  */
@@ -55,7 +61,7 @@ export function initScrollAnimations(rootEl) {
     // 1. (prefers-reduced-motion: reduce): create NO animations; everything is visible and static.
     mm.add('(prefers-reduced-motion: reduce)', () => {
       gsap.set(
-        '[data-reveal], [data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"], [data-reveal="heading-base"], [data-reveal="italic"], [data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax], [data-scrub-word], [data-bio-card], [data-intro-parallax]',
+        '[data-reveal], [data-reveal="heading"], [data-reveal="copy"], [data-reveal="card"], [data-reveal="heading-base"], [data-reveal="italic"], [data-card-num], [data-card-title], [data-card-desc], [data-card-buttons], [data-card-image], [data-card-parallax], [data-scrub-word], [data-bio-card], [data-intro-parallax], [data-contact-bg], [data-contact-pill], [data-contact-buttons], [data-contact-card], [data-contact-row], [data-contact-footer]',
         {
           opacity: 1,
           x: 0,
@@ -64,6 +70,7 @@ export function initScrollAnimations(rootEl) {
           clearProps: 'all'
         }
       );
+      gsap.set('[data-contact-bg]', { opacity: 0.9 });
     });
 
     // 2. (min-width: 1024px): full scrubbed effects.
@@ -94,12 +101,16 @@ export function initScrollAnimations(rootEl) {
 function setupDesktopAnimations(rootEl) {
   setupHeadingsDesktop(rootEl);
   setupCardsDesktop(rootEl);
+  setupContactEntranceDesktop(rootEl);
 }
 
 function setupMobileAnimations(rootEl) {
   const headings = rootEl.querySelectorAll('[data-reveal="heading"]');
 
   headings.forEach((heading) => {
+    // Contact heading is orchestrated by setupContactEntranceMobile
+    if (heading.closest('#contact')) return;
+
     const triggerEl = heading.closest('.overflow-hidden') || heading.parentElement || heading;
     const section = heading.closest('section');
 
@@ -172,12 +183,17 @@ function setupMobileAnimations(rootEl) {
 
   // Mobile card animations handled in Phase 2
   setupCardsMobile(rootEl);
+  // Mobile contact entrance handled in Effect B
+  setupContactEntranceMobile(rootEl);
 }
 
 function setupHeadingsDesktop(rootEl) {
   const headings = rootEl.querySelectorAll('[data-reveal="heading"]');
 
   headings.forEach((heading) => {
+    // Contact heading is orchestrated by setupContactEntranceDesktop
+    if (heading.closest('#contact')) return;
+
     const triggerEl = heading.closest('.overflow-hidden') || heading.parentElement || heading;
     const section = heading.closest('section');
 
@@ -397,4 +413,135 @@ function setupBioScrub(rootEl) {
     }
   }
 }
+
+function setupContactEntranceDesktop(rootEl) {
+  const section = rootEl.querySelector('#contact');
+  if (!section) return;
+
+  const bgEl = section.querySelector('[data-contact-bg]');
+  const pill = section.querySelector('[data-contact-pill]');
+  const heading = section.querySelector('[data-reveal="heading"]');
+  const buttons = section.querySelector('[data-contact-buttons]');
+  const card = section.querySelector('[data-contact-card]');
+  const rows = section.querySelectorAll('[data-contact-row]');
+  const footer = section.querySelector('[data-contact-footer]');
+
+  // Background blend-in: scrub opacity 0 -> 0.9 as section scrolls into view
+  if (bgEl) {
+    gsap.set(bgEl, { opacity: 0 });
+    gsap.fromTo(
+      bgEl,
+      { opacity: 0 },
+      {
+        opacity: 0.9,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: CONTACT_BG_START,
+          end: CONTACT_BG_END,
+          scrub: SCRUB
+        }
+      }
+    );
+  }
+
+  // Content entrance (one-shot, once: true, trigger when section top hits 75% of viewport)
+  const initialElements = [pill, buttons, card, footer].filter(Boolean);
+  if (initialElements.length > 0) {
+    gsap.set(initialElements, { opacity: 0 });
+  }
+  if (rows && rows.length > 0) {
+    gsap.set(rows, { opacity: 0, y: 12 });
+  }
+  if (pill) gsap.set(pill, { y: 12 });
+  if (heading) gsap.set(heading, { yPercent: 105, opacity: 0 });
+  if (buttons) gsap.set(buttons, { y: 16 });
+  if (card) gsap.set(card, { y: 24 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: CONTACT_START,
+      once: true
+    }
+  });
+
+  if (pill) {
+    tl.to(pill, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, 0);
+  }
+  if (heading) {
+    tl.to(heading, { opacity: 1, yPercent: 0, duration: DURATION, ease: EASE }, STAGGER);
+  }
+  if (buttons) {
+    tl.to(buttons, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, STAGGER * 2);
+  }
+  if (card) {
+    tl.to(card, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, STAGGER * 3);
+  }
+  if (rows && rows.length > 0) {
+    tl.to(rows, { opacity: 1, y: 0, duration: DURATION, ease: EASE, stagger: ROW_STAGGER }, STAGGER * 4);
+  }
+  if (footer) {
+    tl.to(footer, { opacity: 1, duration: DURATION, ease: EASE }, '+=0.04');
+  }
+}
+
+function setupContactEntranceMobile(rootEl) {
+  const section = rootEl.querySelector('#contact');
+  if (!section) return;
+
+  const bgEl = section.querySelector('[data-contact-bg]');
+  const pill = section.querySelector('[data-contact-pill]');
+  const heading = section.querySelector('[data-reveal="heading"]');
+  const buttons = section.querySelector('[data-contact-buttons]');
+  const card = section.querySelector('[data-contact-card]');
+  const rows = section.querySelectorAll('[data-contact-row]');
+  const footer = section.querySelector('[data-contact-footer]');
+
+  if (bgEl) {
+    gsap.set(bgEl, { opacity: 0 });
+  }
+  const initialElements = [pill, buttons, card, footer].filter(Boolean);
+  if (initialElements.length > 0) {
+    gsap.set(initialElements, { opacity: 0 });
+  }
+  if (rows && rows.length > 0) {
+    gsap.set(rows, { opacity: 0, y: 12 });
+  }
+  if (pill) gsap.set(pill, { y: 12 });
+  if (heading) gsap.set(heading, { yPercent: 105, opacity: 0 });
+  if (buttons) gsap.set(buttons, { y: 16 });
+  if (card) gsap.set(card, { y: 24 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: CONTACT_START,
+      once: true
+    }
+  });
+
+  if (bgEl) {
+    tl.to(bgEl, { opacity: 0.9, duration: DURATION, ease: EASE }, 0);
+  }
+  if (pill) {
+    tl.to(pill, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, 0);
+  }
+  if (heading) {
+    tl.to(heading, { opacity: 1, yPercent: 0, duration: DURATION, ease: EASE }, STAGGER);
+  }
+  if (buttons) {
+    tl.to(buttons, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, STAGGER * 2);
+  }
+  if (card) {
+    tl.to(card, { opacity: 1, y: 0, duration: DURATION, ease: EASE }, STAGGER * 3);
+  }
+  if (rows && rows.length > 0) {
+    tl.to(rows, { opacity: 1, y: 0, duration: DURATION, ease: EASE, stagger: ROW_STAGGER }, STAGGER * 4);
+  }
+  if (footer) {
+    tl.to(footer, { opacity: 1, duration: DURATION, ease: EASE }, '+=0.04');
+  }
+}
+
 
