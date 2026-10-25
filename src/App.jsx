@@ -849,12 +849,14 @@ export default function App() {
           <div className="space-y-3 overflow-hidden stack-edge-mask py-1">
             {marqueeRows.map((rowItems, rowIdx) => {
               const duplicated = [...rowItems, ...rowItems, ...rowItems];
-              const animClass =
-                rowIdx % 2 === 0 ? 'animate-marquee-left' : 'animate-marquee-right';
               return (
                 <div key={rowIdx} className="overflow-hidden w-full">
                   <div
-                    className={`${animClass} gap-3`}
+                    className={
+                      rowIdx % 2 === 0
+                        ? 'animate-marquee-left gap-3'
+                        : 'animate-marquee-right gap-3'
+                    }
                     style={marqueePaused ? { animationPlayState: 'paused' } : {}}
                   >
                     {duplicated.map((tech, idx) => (
