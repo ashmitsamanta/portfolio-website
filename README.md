@@ -71,10 +71,8 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 portfolio-website/
 ├── public/                 # Static assets
 │   ├── assets/             # Project screenshots & cutout textures
-│   │   ├── cyberscope.png
 │   │   ├── cyberscope.webp
 │   │   ├── portrait_cutout.webp
-│   │   ├── veribyte.png
 │   │   └── veribyte.webp
 │   └── favicon.svg         # SVG favicon
 ├── src/
