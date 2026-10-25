@@ -56,6 +56,8 @@ const PROJECT_ATLAS_IMAGES = [
   '/assets/cyberscope.png'
 ];
 
+const CONTACT_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
 export default function App() {
   const config = DEFAULT_CONFIG;
 
@@ -91,7 +93,8 @@ export default function App() {
     name: '',
     email: '',
     subject: 'React Native App Project',
-    message: ''
+    message: '',
+    botField: ''
   });
   const [contactStatus, setContactStatus] = useState('idle');
 
@@ -493,17 +496,41 @@ export default function App() {
   ];
 
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
+    if (contactForm.botField) {
+      return;
+    }
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
       showToast('Please fill in your name, email, and message.');
       return;
     }
     setContactStatus('sending');
-    setTimeout(() => {
-      setContactStatus('sent');
-      showToast('Message prepared! You can also send directly via Email.');
-    }, 600);
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: contactForm.name.trim(),
+          email: contactForm.email.trim(),
+          subject: contactForm.subject,
+          message: contactForm.message.trim()
+        })
+      });
+
+      if (response.ok) {
+        setContactStatus('sent');
+        showToast('Message sent! I will get back to you soon.');
+      } else {
+        throw new Error('Submission failed');
+      }
+    } catch (err) {
+      setContactStatus('idle');
+      showToast('Unable to send message. Please use the email button directly.');
+    }
   };
 
 
@@ -1364,6 +1391,16 @@ export default function App() {
             </button>
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <h3 className="text-xl font-black uppercase">Send Project Brief</h3>
+              <input
+                type="text"
+                name="_gotcha"
+                value={contactForm.botField}
+                onChange={(e) => setContactForm({ ...contactForm, botField: e.target.value })}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
               <div>
                 <label className="block font-mono text-xs uppercase text-neutral-400 mb-1">
                   Your Name
