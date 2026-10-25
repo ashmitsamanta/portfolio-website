@@ -55,7 +55,7 @@ export interface PortfolioConfig {
 
 export const PORTFOLIO_CONFIG: PortfolioConfig = {
   personal: {
-    name: 'ASHMIT',
+    name: 'ASHMIT SAMANTA',
     shortName: 'ASHMIT',
     role: 'Full-Stack',
     roleItalic: 'Developer',

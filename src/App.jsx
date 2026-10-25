@@ -841,7 +841,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => scrollToSection('home')}
-            className="font-black tracking-tight text-sm sm:text-base uppercase text-white hover:opacity-80 transition-opacity text-left"
+            className="font-black tracking-tight text-sm sm:text-base uppercase text-white hover:opacity-80 transition-opacity text-left whitespace-nowrap flex items-center shrink-0"
           >
             {config.personal.name}
           </button>
