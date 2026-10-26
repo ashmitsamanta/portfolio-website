@@ -86,12 +86,20 @@ portfolio-website/
 │   ├── animations/
 │   │   └── scrollAnimations.js   # GSAP ScrollTrigger scroll-driven animations
 │   ├── components/
+│   │   ├── AboutSection.jsx      # Bio card, intro typography, and stack marquee container
+│   │   ├── ArcadeMinigame.jsx    # Interactive retro canvas brick-breaker minigame
+│   │   ├── ContactSection.jsx    # Contact section with modal form and email copy trigger
 │   │   ├── HeroWebGL.jsx         # WebGL2 interactive particle & mosaic shader
-│   │   ├── PreloaderWordmark.jsx # Kinetic preloader animation
-│   │   └── ScrubText.jsx         # Memoized word-by-word scroll scrub text
+│   │   ├── Navbar.jsx            # Navigation bar with section links and mobile menu drawer
+│   │   ├── PreloaderWordmark.jsx # Kinetic preloader and hero wordmark animation
+│   │   ├── ProjectModal.jsx      # Modal dialog for project deep-dives and architecture details
+│   │   ├── ProjectsSection.jsx   # Selected works showcase with category filtering and case studies
+│   │   ├── ScrubText.jsx         # Memoized word-by-word scroll scrub text
+│   │   ├── ServicesSection.jsx   # Interactive services list with expandable details and hover fills
+│   │   └── StackMarquee.jsx      # Multi-row infinite scrolling tech stack marquee and layer filter
 │   ├── config/
 │   │   └── portfolio.config.ts   # Centralized portfolio data & copy
-│   ├── App.jsx             # Main application and interactive UI sections
+│   ├── App.jsx             # App shell: layout, hero section, preloader coordination, and shared state
 │   ├── index.css           # Tailwind base directives & root styles
 │   └── main.jsx            # React root mount
 ├── .gitignore              # Git ignore rules
@@ -104,21 +112,34 @@ portfolio-website/
 
 ---
 
+## 🏗️ Architecture
+
+- **App Shell (`src/App.jsx`):** Coordinates global layout, hero parallax/WebGL (`HeroWebGL.jsx`), kinetic preloader sequence (`PreloaderWordmark.jsx`), and shared state (active navigation, toast messages, project modal selection, and contact modal visibility).
+- **Component Sections (`src/components/`):** Self-contained section components (`Navbar`, `AboutSection`, `StackMarquee`, `ServicesSection`, `ProjectsSection`, `ProjectModal`, `ArcadeMinigame`, `ContactSection`, `ScrubText`).
+- **Configuration & Content (`src/config/portfolio.config.ts`):** Central data store for bio, social links, project case studies, services, and stack categories.
+- **Scroll Animations (`src/animations/scrollAnimations.js`):** Scoped GSAP ScrollTrigger timelines and scrub effects initialized by the app shell.
+
+---
+
 ## ⚙️ Customization
 
-Profile details, project cards, service offerings, stack categories, and social links can be customized directly in:
+Profile details, project case studies, service offerings, categorized skills, and social links are configured in:
 
 ```text
 src/config/portfolio.config.ts
 ```
 
-Note: The scrolling marquee stack items are defined directly in `src/App.jsx`.
+Text and configuration hardcoded within specific components:
+- **Marquee tech items (`MARQUEE_ROWS`):** Defined in `src/components/StackMarquee.jsx`.
+- **Preloader letters (`INITIAL_LETTERS`, `TARGET_LETTERS`):** Defined in `src/components/PreloaderWordmark.jsx`.
+- **Navigation links (`NAV_ITEMS`, `MOBILE_NAV_ITEMS`):** Defined in `src/components/Navbar.jsx`.
+- **Contact form endpoint (`CONTACT_ENDPOINT`):** Configured in `src/components/ContactSection.jsx`.
 
 ---
 
 ## 📬 Contact & Connect
 
 - **Author:** Ashmit Samanta
-- **Email:** [ashmitsamanta2007@gmail.com](mailto:ashmitsamanta2007@gmail.com)
+- **Email:** [YOUR_PROFESSIONAL_EMAIL](mailto:YOUR_PROFESSIONAL_EMAIL)
 - **LinkedIn:** [linkedin.com/in/ashmit-samanta-14022b43b](https://www.linkedin.com/in/ashmit-samanta-14022b43b/)
 - **GitHub:** [github.com/ashmitsamanta](https://github.com/ashmitsamanta)
