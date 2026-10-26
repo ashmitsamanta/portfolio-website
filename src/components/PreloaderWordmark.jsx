@@ -28,10 +28,39 @@ export default function PreloaderWordmark({
     const wordmark = wordmarkRef.current;
     if (!dot || !wordmark) return;
 
+    // Bypass preloader animation if reduced motion is requested
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      setIsSlidDown(true);
+      gsap.set(wordmark, { y: 0, scale: 1 });
+      gsap.set(dot, { opacity: 0, display: 'none' });
+      for (let i = 0; i < 9; i++) {
+        if (letterRefs.current[i]) {
+          letterRefs.current[i].textContent = TARGET_LETTERS[i];
+          gsap.set(letterRefs.current[i], { display: 'inline-block', opacity: 1, scale: 1 });
+        }
+      }
+      if (onSlideDownRef.current) onSlideDownRef.current();
+      if (onCompleteRef.current) onCompleteRef.current();
+      return;
+    }
+
     // Lock scroll during preloader animation
     window.scrollTo(0, 0);
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+
+    // Safety fallback: guaranteed unlock after 4.5s maximum so visitor is never trapped
+    const safetyTimer = setTimeout(() => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      setIsSlidDown(true);
+      if (onSlideDownRef.current) onSlideDownRef.current();
+    }, 4500);
 
     // Reset letters & kill any ongoing tweens
     gsap.killTweensOf([dot, wordmark, ...letterRefs.current]);
@@ -217,6 +246,7 @@ export default function PreloaderWordmark({
     return () => {
       cancelled = true;
       clearTimeout(timerId);
+      clearTimeout(safetyTimer);
       gsap.killTweensOf([dot, wordmark, ...letterRefs.current]);
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';

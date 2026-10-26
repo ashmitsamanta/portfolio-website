@@ -7,44 +7,43 @@ const MARQUEE_ROWS = [
     'React.js',
     'TypeScript',
     'JavaScript',
-    'Expo Router',
-    'React Navigation',
-    'Reanimated',
-    'Gesture Handler',
     'Tailwind CSS',
-    'React Native',
-    'Expo'
+    'Vite',
+    'Next.js',
+    'HTML5 Canvas',
+    'Redux',
+    'REST APIs'
   ],
   [
     'Python',
-    'Django',
-    'REST APIs',
-    'Firebase',
-    'Firestore',
-    'Supabase',
+    'FastAPI',
     'PostgreSQL',
+    'SQLAlchemy',
+    'Django',
+    'Supabase',
     'Node.js',
-    'Express.js'
+    'Express.js',
+    'Firebase'
   ],
   [
-    'Push Notifications',
-    'RevenueCat',
-    'react-native-iap',
-    'AsyncStorage',
-    'expo-local-authentication',
-    'EAS Build',
-    'Play Console',
-    'Google Sign-In / OAuth'
+    'Graph Analysis',
+    'NetworkX',
+    'Pytest',
+    'JWT / Auth',
+    'OCR Pipelines',
+    'Face Matching',
+    'Deepfake Detection',
+    'SSE Streaming'
   ],
   [
-    'Postman',
-    'VS Code',
-    'Playwright',
+    'Docker',
+    'Git',
     'GitHub Actions',
     'CI/CD',
-    'Git',
-    'GitHub',
-    'Docker'
+    'Postman',
+    'VS Code',
+    'Linux',
+    'Playwright'
   ]
 ];
 
