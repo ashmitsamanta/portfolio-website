@@ -18,7 +18,7 @@ export default function ServicesSection({
             data-reveal="heading"
             className="metallic-wordmark text-5xl sm:text-7xl font-black uppercase tracking-tighter leading-[0.9] text-right"
           >
-            WHAT WE
+            WHAT I
             <br />
             CAN DO
           </h2>
