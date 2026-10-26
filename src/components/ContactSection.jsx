@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
 
-const CONTACT_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+const CONTACT_ENDPOINT = 'https://formspree.io/f/mwlllqny';
 
 export default function ContactSection({
   config = PORTFOLIO_CONFIG,
@@ -24,7 +24,7 @@ export default function ContactSection({
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
-    subject: 'React Native App Project',
+    subject: 'Project Inquiry',
     message: '',
     botField: ''
   });
@@ -59,9 +59,20 @@ export default function ContactSection({
 
       if (response.ok) {
         setContactStatus('sent');
+        setContactForm({
+          name: '',
+          email: '',
+          subject: 'Project Inquiry',
+          message: '',
+          botField: ''
+        });
         if (showToast) {
           showToast('Message sent! I will get back to you soon.');
         }
+        setTimeout(() => {
+          setContactStatus('idle');
+          if (setShowContactFormModal) setShowContactFormModal(false);
+        }, 1800);
       } else {
         throw new Error('Submission failed');
       }
@@ -236,8 +247,14 @@ export default function ContactSection({
 
       {/* QUICK BRIEF FORM MODAL */}
       {showContactFormModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-lg w-full rounded-3xl bg-[#0D0D0D] border border-white/15 p-6 sm:p-8 relative">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setShowContactFormModal && setShowContactFormModal(false)}
+        >
+          <div
+            className="max-w-lg w-full rounded-3xl bg-[#0D0D0D] border border-white/15 p-6 sm:p-8 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => setShowContactFormModal && setShowContactFormModal(false)}
