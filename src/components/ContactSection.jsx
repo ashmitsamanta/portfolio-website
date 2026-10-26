@@ -32,6 +32,9 @@ export default function ContactSection({
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+    if (contactStatus === 'sending' || contactStatus === 'sent') {
+      return;
+    }
     if (contactForm.botField) {
       return;
     }
@@ -312,9 +315,10 @@ export default function ContactSection({
               </div>
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-full bg-white text-black font-mono text-xs uppercase font-bold"
+                disabled={contactStatus === 'sending' || contactStatus === 'sent'}
+                className="w-full py-3.5 rounded-full bg-white text-black font-mono text-xs uppercase font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
               >
-                {contactStatus === 'sent' ? 'Brief Sent ✓' : 'Send Brief'}
+                {contactStatus === 'sending' ? 'Sending...' : contactStatus === 'sent' ? 'Brief Sent ✓' : 'Send Brief'}
               </button>
             </form>
           </div>
