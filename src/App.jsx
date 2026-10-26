@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
-  ArrowUpRight,
   ArrowDownLeft,
-  Check,
   Copy,
   X,
   Github,
   Linkedin,
   Mail,
   Send,
-  ArrowUp,
-  Eye
+  ArrowUp
 } from 'lucide-react';
 import { PORTFOLIO_CONFIG } from './config/portfolio.config';
 import HeroWebGL from './components/HeroWebGL';
 import PreloaderWordmark from './components/PreloaderWordmark';
 import AboutSection from './components/AboutSection';
 import ServicesSection from './components/ServicesSection';
+import ProjectsSection from './components/ProjectsSection';
 import ArcadeMinigame from './components/ArcadeMinigame';
 import { initScrollAnimations, refreshScrollTrigger } from './animations/scrollAnimations';
 
@@ -452,137 +450,14 @@ export default function App() {
           - Left: Strikethrough "SELECTED" + italic serif "work"
           - Right: Short description + white "Read More ↗" pill
           - Below: 4 Alternating Left/Right Split-Screen Showcase Rows */}
-      <section id="project" className="max-w-7xl mx-auto px-4 sm:px-8 py-24 border-t border-white/[0.08]">
-        <div className="mb-20">
-          <h2
-            data-reveal="heading"
-            aria-label="SELECTED work"
-            className="flex items-baseline gap-3"
-          >
-            <span className="overflow-hidden inline-block pb-2">
-              <span
-                data-reveal="heading-base"
-                className="relative text-4xl sm:text-6xl font-black uppercase tracking-tight text-white inline-block"
-              >
-                SELECTED
-                <span className="absolute left-0 right-0 top-1/2 h-[3px] bg-white" />
-              </span>
-            </span>
-            <span className="overflow-hidden inline-block pb-2">
-              <span
-                data-reveal="italic"
-                className="text-4xl sm:text-6xl font-serif italic font-normal text-neutral-200 inline-block"
-              >
-                work
-              </span>
-            </span>
-          </h2>
-        </div>
-
-        {/* Alternating Split-Screen Project Rows */}
-        <div className="space-y-24">
-          {filteredProjects.map((proj, idx) => {
-            const imageOnLeft = idx % 2 === 0;
-            return (
-              <div
-                key={proj.id}
-                data-reveal="card"
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
-              >
-                <div
-                  className={`lg:col-span-7 ${
-                    imageOnLeft ? 'lg:order-1' : 'lg:order-2'
-                  }`}
-                >
-                  <div data-card-parallax className="h-full">
-                    <div
-                      onClick={() => {
-                        setActiveProjectModal(proj);
-                      }}
-                      className="group relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#0B0B0B] border border-white/10 cursor-pointer"
-                    >
-                      <img
-                        data-card-image
-                        src={proj.image}
-                        alt={`${proj.titlePrefix} ${proj.titleSuffix}`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className={`lg:col-span-5 space-y-5 ${
-                    imageOnLeft ? 'lg:order-2' : 'lg:order-1'
-                  }`}
-                >
-                  <div data-card-num className="font-mono text-xs text-neutral-500">
-                    {proj.num || `0${idx + 1}`}
-                  </div>
-
-                  <h3 data-card-title className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
-                    {proj.titlePrefix}
-                    {proj.titlePrefix?.endsWith('-') || proj.noTitleSpace ? '' : ' '}
-                    {proj.titleItalic && (
-                      <span className="font-serif italic font-normal lowercase text-neutral-300">
-                        {proj.titleItalic}
-                      </span>
-                    )}
-                    <br />
-                    {proj.titleSuffix}
-                  </h3>
-
-                  <p data-card-desc className="text-sm sm:text-base text-neutral-400 leading-relaxed">
-                    {proj.description}
-                  </p>
-
-                  <div data-card-buttons className="flex flex-wrap items-center gap-3 pt-2">
-                    {proj.primaryLabel && proj.primaryUrl && (
-                      <a
-                        href={proj.primaryUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-sans text-xs font-bold tracking-wide hover:opacity-90 transition-opacity"
-                      >
-                        <span>{proj.primaryLabel}</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-
-                    {proj.githubUrl && (
-                      <a
-                        href={proj.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs transition-colors ${
-                          !proj.primaryLabel
-                            ? 'bg-white text-black font-sans font-bold tracking-wide hover:opacity-90'
-                            : 'bg-[#111111] hover:bg-[#1B1B1B] border border-white/15 text-neutral-200 font-medium'
-                        }`}
-                      >
-                        <span>GitHub</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveProjectModal(proj);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 font-mono text-xs uppercase text-neutral-400 hover:text-white"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Details</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <ProjectsSection
+        config={config}
+        projectFilter={projectFilter}
+        setProjectFilter={setProjectFilter}
+        filteredProjects={filteredProjects}
+        activeProjectModal={activeProjectModal}
+        setActiveProjectModal={setActiveProjectModal}
+      />
 
       {/* 6. VIDEO-VERIFIED "HELLO WORLD" CANVAS BRICK BREAKER GAME (t=22.93s -> t=24.13s) */}
       <ArcadeMinigame
@@ -815,98 +690,6 @@ export default function App() {
                 {contactStatus === 'sent' ? 'Brief Sent ✓' : 'Send Brief'}
               </button>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* CASE STUDY MODAL */}
-      {activeProjectModal && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
-          onClick={() => setActiveProjectModal(null)}
-        >
-          <div
-            className="max-w-2xl w-full max-h-[88vh] rounded-2xl sm:rounded-3xl bg-[#0D0D0D] border border-white/15 overflow-hidden shadow-2xl flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Image Banner (compact height so entire modal fits in screen) */}
-            <div className="relative h-44 sm:h-56 w-full bg-black shrink-0 overflow-hidden">
-              <img
-                src={activeProjectModal.image}
-                alt={activeProjectModal.titlePrefix}
-                className="w-full h-full object-cover object-top"
-              />
-              <button
-                type="button"
-                onClick={() => setActiveProjectModal(null)}
-                aria-label="Close modal"
-                className="absolute top-3 right-3 p-2 rounded-full bg-black/80 text-white border border-white/20 hover:bg-white hover:text-black transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Scrollable Content */}
-            <div className="p-5 sm:p-7 space-y-3.5 overflow-y-auto flex-1 min-h-0">
-              <div className="font-mono text-xs uppercase tracking-widest text-neutral-400">
-                {activeProjectModal.category}
-                {activeProjectModal.badge ? ` • ${activeProjectModal.badge}` : ''}
-              </div>
-
-              <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight">
-                {activeProjectModal.titlePrefix}
-                {activeProjectModal.titlePrefix?.endsWith('-') || activeProjectModal.noTitleSpace ? '' : ' '}
-                {activeProjectModal.titleItalic && (
-                  <span className="font-serif italic font-normal lowercase">
-                    {activeProjectModal.titleItalic}
-                  </span>
-                )}{' '}
-                {activeProjectModal.titleSuffix}
-              </h3>
-
-              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
-                {activeProjectModal.detailsDescription || activeProjectModal.description}
-              </p>
-
-              <div className="space-y-2 pt-1">
-                <div className="font-mono text-[11px] uppercase tracking-wider text-neutral-400">
-                  KEY ARCHITECTURAL HIGHLIGHTS:
-                </div>
-                {activeProjectModal.highlights?.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs sm:text-sm text-neutral-200">
-                    <Check className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: config.accentColor }} />
-                    <span>{h}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Buttons in Modal */}
-              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
-                {activeProjectModal.githubUrl && (
-                  <a
-                    href={activeProjectModal.githubUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-black font-sans text-xs font-bold tracking-wide hover:opacity-90 transition-opacity"
-                  >
-                    <span>View on GitHub</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
-                )}
-
-                {activeProjectModal.primaryLabel && activeProjectModal.primaryUrl && (
-                  <a
-                    href={activeProjectModal.primaryUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#111111] hover:bg-[#1B1B1B] border border-white/15 text-xs text-neutral-200 font-medium transition-colors"
-                  >
-                    <span>{activeProjectModal.primaryLabel}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}
