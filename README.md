@@ -140,6 +140,6 @@ Text and configuration hardcoded within specific components:
 ## 📬 Contact & Connect
 
 - **Author:** Ashmit Samanta
-- **Email:** [YOUR_PROFESSIONAL_EMAIL](mailto:YOUR_PROFESSIONAL_EMAIL)
+- **Email:** [ashmitsamanta2007@gmail.com](mailto:ashmitsamanta2007@gmail.com)
 - **LinkedIn:** [linkedin.com/in/ashmit-samanta-14022b43b](https://www.linkedin.com/in/ashmit-samanta-14022b43b/)
 - **GitHub:** [github.com/ashmitsamanta](https://github.com/ashmitsamanta)
