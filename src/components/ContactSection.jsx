@@ -89,7 +89,7 @@ export default function ContactSection({
 
   return (
     <>
-      {/* 7. CONTACT SECTION & FOOTER (t=25.33s -> t=27.77s) */}
+      {/* 7. CONTACT SECTION & FOOTER */}
       <section
         id="contact"
         className="relative overflow-hidden border-t border-white/[0.08] py-24"

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-//  Vertex Shader (#version 300 es) from reference site
+//  Vertex Shader (#version 300 es) 
 const VERTEX_SHADER_SOURCE = `#version 300 es
 precision highp float;
 
@@ -81,7 +81,7 @@ void main() {
 }
 `;
 
-// Fragment Shader (#version 300 es) from reference site
+// Fragment Shader (#version 300 es) 
 const FRAGMENT_SHADER_SOURCE = `#version 300 es
 precision highp float;
 
@@ -167,7 +167,7 @@ function smoothStep(minVal, maxVal, val) {
 // Reference cell pitch calculation based on portrait anchor width
 const getCellPitch = (w) => Math.min(6.0, Math.max(3.5, w / 200.0));
 
-// reference portrait luminance and cell sampling function ($i)
+// luminance and cell sampling function ($i)
 function samplePortrait(img, anchorWidth, cropFraction) {
   const cellPitch = getCellPitch(anchorWidth);
   const cols = Math.max(20, Math.round(anchorWidth / cellPitch));
