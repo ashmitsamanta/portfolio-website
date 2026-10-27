@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
 
-// 4 Marquee rows matching t=8.40s & t=9.80s in Screen Recording 2026-10-21 152553.mp4
+// 4 Marquee rows matching 
 const MARQUEE_ROWS = [
   [
     'React.js',
@@ -62,7 +62,7 @@ export default function StackMarquee({
 
   const marqueeRows = MARQUEE_ROWS;
 
-  // EXACT 4-ROW "THE STACK" MARQUEE (t=8.40s & t=9.80s in video)
+  //  4-ROW "THE STACK" MARQUEE 
   return (
     <div className="mt-24">
       <div className="flex items-center gap-6 mb-8">

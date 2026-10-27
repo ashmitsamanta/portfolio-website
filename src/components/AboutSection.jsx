@@ -9,7 +9,7 @@ export default function AboutSection({
 }) {
   const [introGlow, setIntroGlow] = useState({ x: 50, y: 50 });
 
-  // 2. VIDEO-VERIFIED ABOUT ME ("Intro" + Glass Bio Card) & 4-ROW "THE STACK" MARQUEE (t=8.40s & t=9.80s)
+  // 2. ABOUT ME ("Intro" + Glass Bio Card) & 4-ROW "THE STACK" MARQUEE (t=8.40s & t=9.80s)
   return (
     <section id="about" className="max-w-7xl mx-auto px-4 sm:px-8 py-24 border-t border-white/[0.08]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -55,7 +55,7 @@ export default function AboutSection({
         </div>
       </div>
 
-      {/* EXACT 4-ROW "THE STACK" MARQUEE (t=8.40s & t=9.80s in video) */}
+      {/* 4-ROW "THE STACK" MARQUEE */}
       <StackMarquee config={config} showToast={showToast} />
     </section>
   );

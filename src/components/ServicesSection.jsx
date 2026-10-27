@@ -7,9 +7,8 @@ export default function ServicesSection({
   const [openServiceId, setOpenServiceId] = useState(null);
   const [hoveredServiceId, setHoveredServiceId] = useState(null);
 
-  // 3. VIDEO-VERIFIED SERVICES SECTION (t=9.80s, t=11.20s, t=14.00s):
-  //    - Right-aligned stacked metallic "WHAT WE / CAN DO" heading
-  //    - 6 rows (01-06) with warm cream hover fill (`hover:bg-[#E2DDD2] hover:text-black`) exactly like t=11.20s
+  // 3. - Right-aligned stacked metallic "WHAT WE / CAN DO" heading
+  //    - 6 rows (01-06) with warm cream hover fill (`hover:bg-[#E2DDD2] hover:text-black`) 
   return (
     <section id="service" className="max-w-7xl mx-auto px-4 sm:px-8 py-20 border-t border-white/[0.08]">
       <div className="mb-12 flex justify-end">
