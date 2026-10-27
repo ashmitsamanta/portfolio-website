@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-// Exact Vertex Shader (#version 300 es) from reference site
+//  Vertex Shader (#version 300 es) from reference site
 const VERTEX_SHADER_SOURCE = `#version 300 es
 precision highp float;
 
@@ -81,7 +81,7 @@ void main() {
 }
 `;
 
-// Exact Fragment Shader (#version 300 es) from reference site
+// Fragment Shader (#version 300 es) from reference site
 const FRAGMENT_SHADER_SOURCE = `#version 300 es
 precision highp float;
 
@@ -167,7 +167,7 @@ function smoothStep(minVal, maxVal, val) {
 // Reference cell pitch calculation based on portrait anchor width
 const getCellPitch = (w) => Math.min(6.0, Math.max(3.5, w / 200.0));
 
-// Exact reference portrait luminance and cell sampling function ($i)
+// reference portrait luminance and cell sampling function ($i)
 function samplePortrait(img, anchorWidth, cropFraction) {
   const cellPitch = getCellPitch(anchorWidth);
   const cols = Math.max(20, Math.round(anchorWidth / cellPitch));
@@ -431,7 +431,7 @@ export default function HeroWebGL({
     let lastSampledW = -1;
     let portraitImg = null;
 
-    // Direct dynamic sampling matching reference site
+    // Direct dynamic sampling
     const sampleAndUpload = () => {
       if (!portraitImg) return;
       const anchorBox = anchor.getBoundingClientRect();

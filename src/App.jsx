@@ -193,7 +193,7 @@ export default function App() {
       />
 
       <main>
-        {/* 1. EXACT PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
+        {/* 1.  PRELOADER ("ASHMIT" -> "PORTFOLIO") & WEBGL2 PORTRAIT TILE MOSAIC */}
         <section
           id="home"
           ref={heroSectionRef}
@@ -224,7 +224,7 @@ export default function App() {
           }}
         />
 
-        {/* Zoomed-in Anchor Cutout Portrait Image matching reference site (143vh on desktop, 110vh on mobile) */}
+        {/* Zoomed-in Anchor Cutout Portrait Image matching  (143vh on desktop, 110vh on mobile) */}
         <div className="absolute inset-x-0 top-[30vh] md:top-[2vh] z-10 text-center flex flex-col items-center w-full pointer-events-none">
           <img
             ref={portraitAnchorRef}
@@ -235,7 +235,7 @@ export default function App() {
           />
         </div>
 
-        {/* LAYER 1 (z-10): Exact WebGL2 (#version 300 es) Hero Portrait Particle / Tile Mosaic */}
+        {/* LAYER 1 (z-10):  WebGL2 (#version 300 es) Hero Portrait Particle / Tile Mosaic */}
         <HeroWebGL
           runId={introRunId}
           src={config.personal.portrait || '/assets/portrait_cutout.webp'}
@@ -248,7 +248,7 @@ export default function App() {
 
         {/* Hero Foreground Content wrapper constrained to max-w-7xl */}
         <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col justify-end">
-          {/* LAYER 2 (z-20): Exact Preloader & Hero Name Animation ("ASHMIT" -> "PORTFOLIO") */}
+          {/* LAYER 2 (z-20):  Preloader & Hero Name Animation ("ASHMIT" -> "PORTFOLIO") */}
           <PreloaderWordmark
             runId={introRunId}
             onSlideDown={handleSlideDown}
@@ -297,15 +297,15 @@ export default function App() {
         </div>
       </section>
 
-      {/* 2. VIDEO-VERIFIED ABOUT ME ("Intro" + Glass Bio Card) & 4-ROW "THE STACK" MARQUEE (t=8.40s & t=9.80s) */}
+      {/* 2. ABOUT ME ("Intro" + Glass Bio Card) & 4-ROW "THE STACK" MARQUEE */}
       <AboutSection config={config} showToast={showToast} />
 
-      {/* 3. VIDEO-VERIFIED SERVICES SECTION (t=9.80s, t=11.20s, t=14.00s):
-          - Right-aligned stacked metallic "WHAT WE / CAN DO" heading
-          - 6 rows (01-06) with warm cream hover fill (`hover:bg-[#E2DDD2] hover:text-black`) exactly like t=11.20s */}
+      {/* 3. SERVICES SECTION :
+          - Right-aligned stacked metallic "WHAT I / CAN DO" heading
+          - 6 rows (01-06) with warm cream hover fill (`hover:bg-[#E2DDD2] hover:text-black`) */}
       <ServicesSection config={config} />
 
-      {/* 4. VIDEO-VERIFIED SELECTED WORK SECTION (t=12.60s & t=16.90s -> t=20.50s):
+      {/* 4. SELECTED WORK SECTION :
           - Left: Strikethrough "SELECTED" + italic serif "work"
           - Right: Short description + white "Read More ↗" pill
           - Below: 4 Alternating Left/Right Split-Screen Showcase Rows */}
@@ -318,14 +318,14 @@ export default function App() {
         setActiveProjectModal={setActiveProjectModal}
       />
 
-      {/* 6. VIDEO-VERIFIED "HELLO WORLD" CANVAS BRICK BREAKER GAME (t=22.93s -> t=24.13s) */}
+      {/* 6. "HELLO WORLD" CANVAS BRICK BREAKER GAME  */}
       <ArcadeMinigame
         config={config}
         activeProjectModal={activeProjectModal}
         showContactFormModal={showContactFormModal}
       />
 
-      {/* 7. VIDEO-VERIFIED CONTACT SECTION & FOOTER (t=25.33s -> t=27.77s) */}
+      {/* 7. CONTACT SECTION & FOOTER  */}
       <ContactSection
         config={config}
         showContactFormModal={showContactFormModal}

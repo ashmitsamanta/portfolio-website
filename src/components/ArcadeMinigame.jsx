@@ -517,7 +517,7 @@ export default function ArcadeMinigame({
     };
   }, []);
 
-  // 6. VIDEO-VERIFIED "HELLO WORLD" CANVAS BRICK BREAKER GAME (t=22.93s -> t=24.13s)
+  // 6. "HELLO WORLD" CANVAS BRICK BREAKER GAME 
   return (
     <section id="game" className="max-w-7xl mx-auto px-4 sm:px-8 py-20 border-t border-white/[0.08]">
       <div className="relative bg-[#000000] py-6">

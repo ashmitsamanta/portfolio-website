@@ -11,8 +11,7 @@ export default function ProjectsSection({
   activeProjectModal,
   setActiveProjectModal
 }) {
-  // 4. VIDEO-VERIFIED SELECTED WORK SECTION (t=12.60s & t=16.90s -> t=20.50s):
-  //    - Left: Strikethrough "SELECTED" + italic serif "work"
+  // 4. - Left: Strikethrough "SELECTED" + italic serif "work"
   //    - Right: Short description + white "Read More ↗" pill
   //    - Below: 4 Alternating Left/Right Split-Screen Showcase Rows
   return (
