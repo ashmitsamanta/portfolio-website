@@ -225,7 +225,7 @@ export default function App() {
         />
 
         {/* Zoomed-in Anchor Cutout Portrait Image matching  (143vh on desktop, 110vh on mobile) */}
-        <div className="absolute inset-x-0 top-[30vh] md:top-[2vh] z-10 text-center flex flex-col items-center w-full pointer-events-none">
+        <div className="absolute inset-x-0 top-[8vh] md:top-[2vh] z-10 text-center flex flex-col items-center w-full pointer-events-none">
           <img
             ref={portraitAnchorRef}
             src={config.personal.portrait || '/assets/portrait_cutout.webp'}
