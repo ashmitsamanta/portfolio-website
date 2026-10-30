@@ -231,7 +231,7 @@ export default function App() {
             src={config.personal.portrait || '/assets/portrait_cutout.webp'}
             alt=""
             aria-hidden="true"
-            className="invisible w-auto max-w-none h-[110vh] md:h-[143vh] -translate-x-[4.2%] md:translate-x-0"
+            className="invisible w-auto max-w-none h-[110vh] md:h-[143vh] -translate-x-[3%] md:translate-x-0"
           />
         </div>
 
