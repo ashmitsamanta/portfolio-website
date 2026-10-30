@@ -80,7 +80,7 @@ export default function ProjectsSection({
                   imageOnLeft ? 'lg:order-2' : 'lg:order-1'
                 }`}
               >
-                <div data-card-num className="font-mono text-xs text-neutral-500">
+                <div data-card-num className="font-mono text-xs text-[#8A8A8A]">
                   {proj.num || `0${idx + 1}`}
                 </div>
 

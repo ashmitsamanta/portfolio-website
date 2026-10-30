@@ -16,7 +16,7 @@ export default function AboutSection({
         <div className="lg:col-span-5">
           <div
             data-reveal="copy"
-            className="font-mono text-[11px] uppercase tracking-[0.28em] text-neutral-500 mb-3"
+            className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#8A8A8A] mb-3"
           >
             ABOUT ME
           </div>

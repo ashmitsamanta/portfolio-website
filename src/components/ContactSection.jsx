@@ -147,7 +147,7 @@ export default function ContactSection({
               >
                 <div data-contact-row className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
                   <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-1">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-1">
                       EMAIL
                     </div>
                     <div className="text-sm sm:text-base text-white break-all">
@@ -166,14 +166,14 @@ export default function ContactSection({
 
 
                 <div data-contact-row className="border-b border-white/[0.08] pb-5">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-1">
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-1">
                     BASED IN
                   </div>
                   <div className="text-sm sm:text-base text-white">{config.personal.location}</div>
                 </div>
 
                 <div data-contact-row>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-3">
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-3">
                     ELSEWHERE
                   </div>
                   <div className="flex items-center gap-3">
@@ -201,7 +201,7 @@ export default function ContactSection({
             </div>
           </div>
 
-          <footer data-contact-footer className="mt-24 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-neutral-500">
+          <footer data-contact-footer className="mt-24 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-[#8A8A8A]">
             <div>
               © {new Date().getFullYear()} {config.personal.name}. All rights reserved.
             </div>

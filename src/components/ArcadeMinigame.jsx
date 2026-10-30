@@ -525,7 +525,7 @@ export default function ArcadeMinigame({
           <span className="text-xs sm:text-sm text-neutral-300 border-b border-neutral-500 pb-1">
             Break it if you can. It still ships.
           </span>
-          <span className="font-mono text-xs text-neutral-500">
+          <span className="font-mono text-xs text-[#8A8A8A]">
             SCORE: {score} • TILES: {bricksLeft}
           </span>
         </div>
