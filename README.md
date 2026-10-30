@@ -6,7 +6,7 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-**Live:** https://portfolio-website-beige-zeta-42.vercel.app/
+**Live:** https://ashmitsamanta-portfolio.vercel.app/
 
 ---
 
