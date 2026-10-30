@@ -211,7 +211,7 @@ export default function App() {
           onMouseLeave={() => {
             setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
           }}
-          className="relative min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
+          className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
           style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
         >
           <h1 className="sr-only">Ashmit - Full-Stack Developer</h1>
@@ -231,7 +231,7 @@ export default function App() {
             src={config.personal.portrait || '/assets/portrait_cutout.webp'}
             alt=""
             aria-hidden="true"
-            className="invisible w-auto max-w-none h-[110vh] md:h-[143vh]"
+            className="invisible w-auto max-w-none h-[110vh] md:h-[143vh] -translate-x-[4.2%] md:translate-x-0"
           />
         </div>
 
@@ -264,23 +264,23 @@ export default function App() {
               transition: 'all 700ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}
             onClick={(e) => e.stopPropagation()}
-            className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2"
+            className="relative z-30 flex flex-row items-center justify-between gap-3 sm:gap-4 pt-2"
           >
-            <div className="flex items-baseline gap-2.5">
-              <span className="text-xl sm:text-3xl md:text-[34px] font-extrabold tracking-tight text-white">
+            <div className="flex items-baseline gap-2 sm:gap-2.5 whitespace-nowrap">
+              <span className="text-base sm:text-3xl md:text-[34px] font-extrabold tracking-tight text-white">
                 {config.personal.role}
               </span>
-              <span className="text-xl sm:text-3xl md:text-[34px] font-serif italic font-light text-neutral-300">
+              <span className="text-base sm:text-3xl md:text-[34px] font-serif italic font-light text-neutral-300">
                 {config.personal.roleItalic}
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-nowrap sm:flex-wrap shrink-0 items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => scrollToSection('about')}
                 aria-label="Scroll to About Section"
-                className="w-10 h-10 rounded-full bg-[#0A0A0A] hover:bg-white text-neutral-300 hover:text-black border border-white/20 flex items-center justify-center transition-all"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0A0A0A] hover:bg-white text-neutral-300 hover:text-black border border-white/20 flex items-center justify-center transition-all"
               >
                 <ArrowDownLeft className="w-4 h-4" />
               </button>
@@ -288,7 +288,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => scrollToSection('contact')}
-                className="px-7 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-white text-white hover:text-black border border-white/25 font-sans text-xs sm:text-sm font-medium tracking-wide transition-all"
+                className="px-5 sm:px-7 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-white text-white hover:text-black border border-white/25 font-sans text-xs sm:text-sm font-medium tracking-wide transition-all"
               >
                 Contact
               </button>

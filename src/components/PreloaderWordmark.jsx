@@ -255,7 +255,7 @@ export default function PreloaderWordmark({
 
   return (
     <div
-      className="relative z-20 w-full flex justify-center pointer-events-none mb-3 sm:mb-5"
+      className="relative z-20 w-full flex justify-center pointer-events-none mb-5"
       style={{
         transform: isSlidDown ? `translate3d(${heroTilt.ry * -0.4}px, 0, 0)` : 'none',
         transition: isSlidDown ? 'transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'
