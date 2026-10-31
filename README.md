@@ -81,7 +81,10 @@ portfolio-website/
 │   │   ├── cyberscope.webp
 │   │   ├── portrait_cutout.webp
 │   │   └── veribyte.webp
-│   └── favicon.svg         # SVG favicon
+│   ├── favicon.svg         # SVG favicon
+│   ├── llms.txt            # LLM-readable summary and project links
+│   ├── robots.txt          # Crawler directives & sitemap reference
+│   └── sitemap.xml         # Search engine sitemap
 ├── src/
 │   ├── animations/
 │   │   └── scrollAnimations.js   # GSAP ScrollTrigger scroll-driven animations
