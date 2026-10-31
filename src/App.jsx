@@ -6,6 +6,7 @@ import PreloaderWordmark from './components/PreloaderWordmark';
 import AboutSection from './components/AboutSection';
 import ServicesSection from './components/ServicesSection';
 import ProjectsSection from './components/ProjectsSection';
+import EducationSection from './components/EducationSection';
 import ArcadeMinigame from './components/ArcadeMinigame';
 import ContactSection from './components/ContactSection';
 import Navbar from './components/Navbar';
@@ -299,6 +300,9 @@ export default function App() {
 
       {/* 2. ABOUT ME ("Intro" + Glass Bio Card) & 4-ROW "THE STACK" MARQUEE */}
       <AboutSection config={config} showToast={showToast} />
+
+      {/* EDUCATION SECTION */}
+      <EducationSection config={config} />
 
       {/* 3. SERVICES SECTION :
           - Right-aligned stacked metallic "WHAT I / CAN DO" heading

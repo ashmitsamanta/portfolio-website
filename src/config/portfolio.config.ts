@@ -1,3 +1,9 @@
+export interface EducationItem {
+  institution: string;
+  degree: string;
+  period: string;
+}
+
 export interface PortfolioConfig {
   personal: {
     name: string;
@@ -51,6 +57,7 @@ export interface PortfolioConfig {
     primaryUrl: string;
     githubUrl: string;
   }>;
+  education: EducationItem[];
 }
 
 export const PORTFOLIO_CONFIG: PortfolioConfig = {
@@ -170,7 +177,13 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
       githubUrl: 'https://github.com/ashmitsamanta/CyberScope.git'
     }
   ],
-
+  education: [
+    {
+      institution: 'Techno International New Town',
+      degree: 'B.Tech (Computer Science)',
+      period: '2026-2030'
+    }
+  ],
 };
 
 export default PORTFOLIO_CONFIG;
