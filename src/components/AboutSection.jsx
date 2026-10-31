@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
 import ScrubText from './ScrubText';
 import StackMarquee from './StackMarquee';
+import EducationSection from './EducationSection';
 
 export default function AboutSection({
   config = PORTFOLIO_CONFIG,
@@ -54,6 +55,9 @@ export default function AboutSection({
           </div>
         </div>
       </div>
+
+      {/* EDUCATION */}
+      <EducationSection config={config} embedded />
 
       {/* 4-ROW "THE STACK" MARQUEE */}
       <StackMarquee config={config} showToast={showToast} />

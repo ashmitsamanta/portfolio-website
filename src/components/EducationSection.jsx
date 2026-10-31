@@ -2,17 +2,14 @@ import React from 'react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
 
 export default function EducationSection({
-  config = PORTFOLIO_CONFIG
+  config = PORTFOLIO_CONFIG,
+  embedded = false
 }) {
   const education = config.education || [];
   if (!education.length) return null;
 
-  return (
-    <section
-      id="education"
-      aria-labelledby="education-heading"
-      className="max-w-7xl mx-auto px-4 sm:px-8 py-20 border-t border-white/[0.08]"
-    >
+  const content = (
+    <>
       <div className="mb-12">
         <div className="overflow-hidden pb-2">
           <h2
@@ -46,6 +43,28 @@ export default function EducationSection({
           </div>
         ))}
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <section
+        id="education"
+        aria-labelledby="education-heading"
+        className="mt-24 pt-20 border-t border-white/[0.08]"
+      >
+        {content}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      id="education"
+      aria-labelledby="education-heading"
+      className="max-w-7xl mx-auto px-4 sm:px-8 py-20 border-t border-white/[0.08]"
+    >
+      {content}
     </section>
   );
 }
