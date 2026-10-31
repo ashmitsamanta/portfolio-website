@@ -1,0 +1,14 @@
+# Ashmit Samanta
+
+CSE student and Full-Stack Developer building web applications, document verification systems, and fraud-detection layers with FastAPI, PostgreSQL, Python, and React.js.
+
+## Projects
+
+- [Veri-byte](https://github.com/ashmitsamanta/Veri-Byte-Web-Page.git): An AI-assisted identity and document verification platform, built with React, Vite, and a FastAPI backend with Supabase.
+- [CyberScope](https://github.com/ashmitsamanta/CyberScope.git): An explainable fraud intelligence platform that links messages, phone numbers, URLs, payment identifiers, and bank accounts into a single fraud graph.
+
+## Links
+
+- Website: https://ashmitsamanta-portfolio.vercel.app/
+- GitHub: https://github.com/ashmitsamanta
+- LinkedIn: https://www.linkedin.com/in/ashmit-samanta-14022b43b/
