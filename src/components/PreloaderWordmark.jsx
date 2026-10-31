@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
+const INTRO_SPEED = 1.4;
 const TARGET_LETTERS = ['P', 'O', 'R', 'T', 'F', 'O', 'L', 'I', 'O'];
 const INITIAL_LETTERS = ['A', 'S', 'H', 'M', 'I', 'T'];
 
@@ -123,6 +124,7 @@ export default function PreloaderWordmark({
       gsap.set(dot, { x: p0.x, y: p0.y - 45, opacity: 0 });
 
       const tl = gsap.timeline();
+      tl.timeScale(INTRO_SPEED);
 
       // Hop 0: Drop in & squash impact onto letter 0 ("A" -> "P")
       // Keyframe physics:
