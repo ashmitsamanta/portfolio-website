@@ -14,9 +14,12 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 
 - **🎨 WebGL2 Particle & Mosaic Portrait:** Interactive GPU shader that dissolves and animates particles based on cursor physics and scroll state.
 - **⚡ Kinetic Preloader & Wordmark Animations:** Fluid GSAP timelines with animated letter transitions.
+- **🧭 Scroll-Spy Navigation:** Active section highlighting in the navbar tracks manual scroll position in real time (`activeNav` updated on scroll in `App.jsx`) with programmatic smooth-scroll locking.
 - **🎮 Built-In Arcade Minigame:** Interactive retro brick-breaker canvas game embedded directly into the layout.
-- **💼 Selected Works & Architecture Modals:** Deep dive into featured systems (*Veribyte* document verification & *CyberScope* fraud-detection engine) with architectural highlights.
-- **📬 Contact & Quick Brief Form:** Interactive contact brief modal with email copy trigger and form submission handler.
+- **💼 Selected Works & Architecture Modals:** Deep dive into featured systems (*Veri-Byte* document verification & *CyberScope* fraud-detection engine) with architectural highlights.
+- **📬 Contact & Quick Brief Form:** Interactive contact brief modal with email copy trigger, Formspree submission handler, and hidden honeypot spam protection.
+- **♿ Motion Accessibility:** Respects `prefers-reduced-motion` across GSAP scroll animations, WebGL particles, and preloader sequences.
+- **⚙️ Centralized Configuration:** Portfolio bio, social links, project case studies, services, education, and tech skills driven entirely from `src/config/portfolio.config.ts`.
 - **📱 Fully Responsive Design:** Sleek dark-mode aesthetic, customized typography (Inter, Playfair Display, JetBrains Mono), and subtle film-grain overlay.
 
 ---
@@ -24,9 +27,10 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 ## ⚡ Tech Stack
 
 - **Core & Framework:** React 18, Vite 5
-- **Styling:** Tailwind CSS, PostCSS
-- **Animations & Graphics:** GSAP 3 + ScrollTrigger, WebGL 2, HTML5 Canvas
+- **Styling:** Tailwind CSS 3, PostCSS, Autoprefixer
+- **Animations & Graphics:** GSAP 3 + ScrollTrigger, WebGL2, HTML5 Canvas
 - **Icons:** Lucide React
+- **Services:** Formspree (contact form endpoint)
 
 ---
 
@@ -62,6 +66,14 @@ A modern, interactive developer portfolio built with **React**, **Vite**, **Tail
 
 ---
 
+## ⚡ Performance
+
+Lighthouse lab results, October 2026:
+- **Desktop:** Performance 99, Accessibility 96, Best Practices 100, SEO 100
+- **Mobile:** Performance 94, Accessibility 96, Best Practices 100, SEO 100
+
+---
+
 ## 🌐 Deployment
 
 This project deploys as a static site (e.g., on Vercel):
@@ -69,6 +81,8 @@ This project deploys as a static site (e.g., on Vercel):
 - **Framework Preset:** Vite
 - **Build Command:** `npm run build`
 - **Output Directory:** `dist`
+
+> **Tip:** After changing the domain, update the canonical, `og:url`, `og:image`, and `twitter:image` URLs in `index.html`.
 
 ---
 
@@ -78,11 +92,12 @@ This project deploys as a static site (e.g., on Vercel):
 portfolio-website/
 ├── public/                 # Static assets
 │   ├── assets/             # Project screenshots & cutout textures
-│   │   ├── cyberscope.webp
-│   │   ├── portrait_cutout.webp
-│   │   └── veribyte.webp
+│   │   ├── cyberscope.webp # Screenshot for CyberScope project
+│   │   ├── portrait_cutout.webp # WebGL cutout portrait texture
+│   │   └── veribyte.webp   # Screenshot for Veri-Byte project
 │   ├── favicon.svg         # SVG favicon
 │   ├── llms.txt            # LLM-readable summary and project links
+│   ├── og.jpg              # Open Graph social preview image
 │   ├── robots.txt          # Crawler directives & sitemap reference
 │   └── sitemap.xml         # Search engine sitemap
 ├── src/
@@ -92,8 +107,10 @@ portfolio-website/
 │   │   ├── AboutSection.jsx      # Bio card, intro typography, and stack marquee container
 │   │   ├── ArcadeMinigame.jsx    # Interactive retro canvas brick-breaker minigame
 │   │   ├── ContactSection.jsx    # Contact section with modal form and email copy trigger
+│   │   ├── EducationSection.jsx  # Education timeline and qualifications showcase
+│   │   ├── ErrorBoundary.jsx     # Top-level React error boundary fallback
 │   │   ├── HeroWebGL.jsx         # WebGL2 interactive particle & mosaic shader
-│   │   ├── Navbar.jsx            # Navigation bar with section links and mobile menu drawer
+│   │   ├── Navbar.jsx            # Navigation bar with scroll-spy links and mobile menu drawer
 │   │   ├── PreloaderWordmark.jsx # Kinetic preloader and hero wordmark animation
 │   │   ├── ProjectModal.jsx      # Modal dialog for project deep-dives and architecture details
 │   │   ├── ProjectsSection.jsx   # Selected works showcase with category filtering and case studies
@@ -102,13 +119,15 @@ portfolio-website/
 │   │   └── StackMarquee.jsx      # Multi-row infinite scrolling tech stack marquee and layer filter
 │   ├── config/
 │   │   └── portfolio.config.ts   # Centralized portfolio data & copy
-│   ├── App.jsx             # App shell: layout, hero section, preloader coordination, and shared state
+│   ├── App.jsx             # App shell: layout, hero section, preloader coordination, scroll-spy, and shared state
 │   ├── index.css           # Tailwind base directives & root styles
 │   └── main.jsx            # React root mount
 ├── .gitignore              # Git ignore rules
-├── index.html              # HTML entry with Google Fonts links and film-grain SVG filter
+├── index.html              # HTML entry with SEO/meta tags, fonts, and film-grain SVG filter
 ├── package.json            # Scripts & project dependencies
+├── package-lock.json       # Exact dependency lockfile
 ├── postcss.config.cjs      # PostCSS configuration
+├── README.md               # Project documentation
 ├── tailwind.config.cjs     # Tailwind CSS configuration
 └── vite.config.js          # Vite configuration
 ```
@@ -117,16 +136,16 @@ portfolio-website/
 
 ## 🏗️ Architecture
 
-- **App Shell (`src/App.jsx`):** Coordinates global layout, hero parallax/WebGL (`HeroWebGL.jsx`), kinetic preloader sequence (`PreloaderWordmark.jsx`), and shared state (active navigation, toast messages, project modal selection, and contact modal visibility).
-- **Component Sections (`src/components/`):** Self-contained section components (`Navbar`, `AboutSection`, `StackMarquee`, `ServicesSection`, `ProjectsSection`, `ProjectModal`, `ArcadeMinigame`, `ContactSection`, `ScrubText`).
-- **Configuration & Content (`src/config/portfolio.config.ts`):** Central data store for bio, social links, project case studies, services, and stack categories.
+- **App Shell (`src/App.jsx`):** Coordinates global layout, hero parallax/WebGL (`HeroWebGL.jsx`), kinetic preloader sequence (`PreloaderWordmark.jsx`), and shared state (active navigation driven by scroll-spy and nav clicks, toast notifications, project modal selection, and contact modal visibility).
+- **Component Sections (`src/components/`):** Self-contained section components (`Navbar`, `AboutSection`, `EducationSection`, `StackMarquee`, `ServicesSection`, `ProjectsSection`, `ProjectModal`, `ArcadeMinigame`, `ContactSection`, `ScrubText`) wrapped in an `ErrorBoundary`.
+- **Configuration & Content (`src/config/portfolio.config.ts`):** Central data store for bio, social links, project case studies, services, education, and stack categories.
 - **Scroll Animations (`src/animations/scrollAnimations.js`):** Scoped GSAP ScrollTrigger timelines and scrub effects initialized by the app shell.
 
 ---
 
 ## ⚙️ Customization
 
-Profile details, project case studies, service offerings, categorized skills, and social links are configured in:
+Profile details, project case studies, service offerings, categorized skills, education, and social links are configured in:
 
 ```text
 src/config/portfolio.config.ts
