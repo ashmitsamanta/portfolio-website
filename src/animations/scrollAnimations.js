@@ -12,6 +12,9 @@ export const EASE = 'power3.out';
 export const STAGGER = 0.08;
 export const SCRUB = 0.6;
 export const DIM_OPACITY = 0.3;
+export const TEXT_DIM_NUM = 0.9;
+export const TEXT_DIM_TITLE = 0.6;
+export const TEXT_DIM_BODY = 0.85;
 export const START = 'top 85%';
 export const END = 'top 40%';
 export const PARALLAX_PX = 40;
@@ -287,20 +290,20 @@ function setupCardsDesktop(rootEl) {
       }
     });
 
-    // Number and title scrub from opacity DIM_OPACITY to 1
+    // Number and title scrub from opacity TEXT_DIM_* to 1
     if (numEl) {
-      tl.fromTo(numEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
+      tl.fromTo(numEl, { opacity: TEXT_DIM_NUM }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
     }
     if (titleEl) {
-      tl.fromTo(titleEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
+      tl.fromTo(titleEl, { opacity: TEXT_DIM_TITLE }, { opacity: 1, ease: 'none', duration: 0.6 }, 0);
     }
 
-    // Description and buttons scrub with a slight delay, from DIM_OPACITY to 0.7 for description and 1 for buttons
+    // Description and buttons scrub with a slight delay, from TEXT_DIM_BODY to 0.8 for description and 1 for buttons
     if (descEl) {
-      tl.fromTo(descEl, { opacity: DIM_OPACITY }, { opacity: 0.7, ease: 'none', duration: 0.8 }, 0.2);
+      tl.fromTo(descEl, { opacity: TEXT_DIM_BODY }, { opacity: 0.8, ease: 'none', duration: 0.8 }, 0.2);
     }
     if (buttonsEl) {
-      tl.fromTo(buttonsEl, { opacity: DIM_OPACITY }, { opacity: 1, ease: 'none', duration: 0.8 }, 0.2);
+      tl.fromTo(buttonsEl, { opacity: TEXT_DIM_BODY }, { opacity: 1, ease: 'none', duration: 0.8 }, 0.2);
     }
 
     // Image panel scrubs from brightness-like dimming (opacity DIM_OPACITY to 1) and gentle vertical parallax +-PARALLAX_PX against text
