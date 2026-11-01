@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Check, ArrowUpRight } from 'lucide-react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
 
@@ -7,15 +7,67 @@ export default function ProjectModal({
   onClose,
   config = PORTFOLIO_CONFIG
 }) {
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
   useEffect(() => {
     if (!activeProjectModal) return;
+
+    const previousActiveElement = document.activeElement;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const timer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 0);
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        e.stopPropagation();
         onClose?.();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const modal = modalRef.current;
+        if (!modal) return;
+        const focusables = modal.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first || !modal.contains(document.activeElement)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last || !modal.contains(document.activeElement)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
+    };
   }, [activeProjectModal, onClose]);
 
   if (!activeProjectModal) return null;
@@ -27,6 +79,10 @@ export default function ProjectModal({
       onClick={onClose}
     >
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-modal-title"
         className="max-w-2xl w-full max-h-[88vh] rounded-2xl sm:rounded-3xl bg-[#0D0D0D] border border-white/15 overflow-hidden shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
@@ -38,6 +94,7 @@ export default function ProjectModal({
             className="w-full h-full object-cover object-top"
           />
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Close modal"
@@ -54,7 +111,7 @@ export default function ProjectModal({
             {activeProjectModal.badge ? ` • ${activeProjectModal.badge}` : ''}
           </div>
 
-          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight">
+          <h3 id="project-modal-title" className="text-xl sm:text-2xl font-black uppercase tracking-tight">
             {activeProjectModal.titlePrefix}
             {activeProjectModal.titlePrefix?.endsWith('-') || activeProjectModal.noTitleSpace ? '' : ' '}
             {activeProjectModal.titleItalic && (
