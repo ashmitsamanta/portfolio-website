@@ -26,6 +26,7 @@ export default function App() {
   const heroSectionRef = useRef(null);
   const portraitAnchorRef = useRef(null);
   const rootRef = useRef(null);
+  const navLockRef = useRef(false);
 
   // Navigation & UI state
   const [activeNav, setActiveNav] = useState('home');
@@ -94,9 +95,123 @@ export default function App() {
     setActiveNav(id);
     const el = document.getElementById(id);
     if (el) {
+      navLockRef.current = true;
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+  // Scroll-spy active section highlighting
+  useEffect(() => {
+    if (!heroControlsVisible) return;
+
+    const SPY_IDS = ['home', 'about', 'service', 'project', 'game', 'contact'];
+    let rafId = null;
+    let lockTimer = null;
+    let _locked = false;
+
+    const compute = () => {
+      if (navLockRef.current) return;
+
+      const probe = window.innerHeight * 0.4;
+      let current = 'home';
+
+      for (const id of SPY_IDS) {
+        const el = document.getElementById(id);
+        if (el) {
+          if (el.getBoundingClientRect().top <= probe) {
+            current = id;
+          }
+        }
+      }
+
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+        current = 'contact';
+      }
+
+      setActiveNav((prev) => (prev === current ? prev : current));
+    };
+
+    const scheduleCompute = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        compute();
+      });
+    };
+
+    const releaseLock = () => {
+      if (!navLockRef.current) return;
+      navLockRef.current = false;
+      if (lockTimer) {
+        clearTimeout(lockTimer);
+        lockTimer = null;
+      }
+      scheduleCompute();
+    };
+
+    Object.defineProperty(navLockRef, 'current', {
+      configurable: true,
+      get: () => _locked,
+      set: (val) => {
+        _locked = val;
+        if (val) {
+          if (lockTimer) clearTimeout(lockTimer);
+          lockTimer = setTimeout(releaseLock, 1200);
+        } else if (lockTimer) {
+          clearTimeout(lockTimer);
+          lockTimer = null;
+        }
+      }
+    });
+
+    const handleScroll = () => {
+      if (navLockRef.current) {
+        if (!lockTimer) {
+          lockTimer = setTimeout(releaseLock, 1200);
+        }
+        return;
+      }
+      scheduleCompute();
+    };
+
+    const handleResize = () => {
+      scheduleCompute();
+    };
+
+    const handleUserInterrupt = () => {
+      if (navLockRef.current) {
+        releaseLock();
+      }
+    };
+
+    const handleScrollEnd = () => {
+      if (navLockRef.current) {
+        releaseLock();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('scrollend', handleScrollEnd, { passive: true });
+    window.addEventListener('wheel', handleUserInterrupt, { passive: true });
+    window.addEventListener('touchstart', handleUserInterrupt, { passive: true });
+    window.addEventListener('keydown', handleUserInterrupt, { passive: true });
+
+    scheduleCompute();
+
+    return () => {
+      if (lockTimer) clearTimeout(lockTimer);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scrollend', handleScrollEnd);
+      window.removeEventListener('wheel', handleUserInterrupt);
+      window.removeEventListener('touchstart', handleUserInterrupt);
+      window.removeEventListener('keydown', handleUserInterrupt);
+      delete navLockRef.current;
+      navLockRef.current = false;
+    };
+  }, [heroControlsVisible]);
+
 
   // Filtered projects & stack items
   const filteredProjects =

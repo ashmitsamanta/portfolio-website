@@ -70,12 +70,13 @@ export default function Navbar({
 
         <nav className="hidden lg:flex items-center gap-7">
           {NAV_ITEMS.map((item) => {
-            const isActive = activeNav === item.id;
+            const isActive = activeNav === item.id || (item.id === 'project' && activeNav === 'game');
             return (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => handleNavClick(item.id)}
+                aria-current={isActive ? 'location' : undefined}
                 className={`font-mono text-[11px] tracking-[0.18em] uppercase transition-colors pb-1 ${
                   isActive
                     ? 'text-white font-bold border-b border-white'
