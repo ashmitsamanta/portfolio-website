@@ -90,7 +90,7 @@ export default function StackMarquee({
         </button>
       </div>
 
-      <div className="space-y-3 overflow-hidden stack-edge-mask py-1">
+      <div className="space-y-3 overflow-hidden stack-edge-mask py-1" aria-hidden="true">
         {marqueeRows.map((rowItems, rowIdx) => {
           const duplicated = [...rowItems, ...rowItems, ...rowItems];
           return (
@@ -107,6 +107,7 @@ export default function StackMarquee({
                   <button
                     key={`${tech}-${idx}`}
                     type="button"
+                    tabIndex={-1}
                     onClick={() => showToast && showToast(`${tech} — Production Stack`)}
                     className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#0E0E0E] hover:bg-[#181818] border border-white/[0.08] hover:border-white/25 text-xs sm:text-sm text-neutral-200 font-medium tracking-wide transition-colors shrink-0"
                   >

@@ -28,15 +28,26 @@ export default function ServicesSection({
         {config.services.map((srv) => {
           const isOpen = openServiceId === srv.id;
           const isLit = isOpen || hoveredServiceId === srv.id;
+          const panelId = `service-panel-${srv.id}`;
           return (
             <div
               key={srv.id}
+              role="button"
+              tabIndex={0}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
               onClick={() => {
                 setOpenServiceId(isOpen ? null : srv.id);
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === ' ') e.preventDefault();
+                  setOpenServiceId(isOpen ? null : srv.id);
+                }
+              }}
               onMouseEnter={() => setHoveredServiceId(srv.id)}
               onMouseLeave={() => setHoveredServiceId(null)}
-              className={`border-b border-white/10 px-4 md:px-12 py-6 md:py-8 cursor-pointer transition-colors duration-500 ease-out ${
+              className={`border-b border-white/10 px-4 md:px-12 py-6 md:py-8 cursor-pointer transition-colors duration-500 ease-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/70 focus-visible:outline-offset-2 ${
                 isLit ? 'bg-[#cfc9bc]' : 'bg-transparent'
               }`}
             >
@@ -79,6 +90,7 @@ export default function ServicesSection({
 
               {/* 2. Expandable Content Drawer: Two columns indented to match title */}
               <div
+                id={panelId}
                 className={`overflow-hidden transition-all duration-500 ease-in-out w-full ${
                   isOpen ? 'max-h-[700px] opacity-100 mt-6 sm:mt-8' : 'max-h-0 opacity-0 mt-0'
                 }`}
