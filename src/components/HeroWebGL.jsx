@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 //  Vertex Shader (#version 300 es) 
 const VERTEX_SHADER_SOURCE = `#version 300 es
@@ -266,6 +266,7 @@ export default function HeroWebGL({
   const startTimeRef = useRef(null);
   const playRef = useRef(play);
   playRef.current = play;
+  const [contextLossCount, setContextLossCount] = useState(0);
 
   // Reset clock on replay
   useEffect(() => {
@@ -602,9 +603,23 @@ export default function HeroWebGL({
       animId = requestAnimationFrame(render);
     };
 
+    const onContextLost = (e) => {
+      e.preventDefault();
+      stopLoop();
+    };
+
+    const onContextRestored = () => {
+      setContextLossCount((c) => c + 1);
+    };
+
+    canvas.addEventListener('webglcontextlost', onContextLost, false);
+    canvas.addEventListener('webglcontextrestored', onContextRestored, false);
+
     startLoop();
 
     return () => {
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      canvas.removeEventListener('webglcontextrestored', onContextRestored);
       stopLoop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       if (motionQuery && motionQuery.removeEventListener) {
@@ -615,12 +630,16 @@ export default function HeroWebGL({
       observer.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerleave', onPointerLeave);
-      gl.deleteProgram(program);
-      gl.deleteTexture(atlasTexture);
-      buffers.forEach((buf) => gl.deleteBuffer(buf));
-      gl.deleteVertexArray(vao);
+      try {
+        if (!gl.isContextLost()) {
+          gl.deleteProgram(program);
+          gl.deleteTexture(atlasTexture);
+          buffers.forEach((buf) => gl.deleteBuffer(buf));
+          gl.deleteVertexArray(vao);
+        }
+      } catch (_) {}
     };
-  }, [src, JSON.stringify(thumbs)]);
+  }, [src, JSON.stringify(thumbs), contextLossCount]);
 
   return (
     <canvas

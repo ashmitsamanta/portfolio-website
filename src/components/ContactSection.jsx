@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Mail,
   Send,
@@ -29,6 +29,69 @@ export default function ContactSection({
     botField: ''
   });
   const [contactStatus, setContactStatus] = useState('idle');
+
+  const contactModalRef = useRef(null);
+  const contactCloseBtnRef = useRef(null);
+
+  useEffect(() => {
+    if (!showContactFormModal) return;
+
+    const previousActiveElement = document.activeElement;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const timer = setTimeout(() => {
+      contactCloseBtnRef.current?.focus();
+    }, 0);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        if (setShowContactFormModal) setShowContactFormModal(false);
+        return;
+      }
+      if (e.key === 'Tab') {
+        const modal = contactModalRef.current;
+        if (!modal) return;
+        const focusables = modal.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first || !modal.contains(document.activeElement)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last || !modal.contains(document.activeElement)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
+    };
+  }, [showContactFormModal, setShowContactFormModal]);
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -255,18 +318,24 @@ export default function ContactSection({
           onClick={() => setShowContactFormModal && setShowContactFormModal(false)}
         >
           <div
+            ref={contactModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-modal-title"
             className="max-w-lg w-full rounded-3xl bg-[#0D0D0D] border border-white/15 p-6 sm:p-8 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
+              ref={contactCloseBtnRef}
               type="button"
+              aria-label="Close modal"
               onClick={() => setShowContactFormModal && setShowContactFormModal(false)}
               className="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-neutral-300"
             >
               <X className="w-4 h-4" />
             </button>
             <form onSubmit={handleContactSubmit} className="space-y-4">
-              <h3 className="text-xl font-black uppercase">Send Project Brief</h3>
+              <h3 id="contact-modal-title" className="text-xl font-black uppercase">Send Project Brief</h3>
               <input
                 type="text"
                 name="_gotcha"
