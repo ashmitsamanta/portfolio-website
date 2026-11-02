@@ -24,6 +24,16 @@ export default function App() {
   const [introRunId, setIntroRunId] = useState(0);
   const [heroControlsVisible, setHeroControlsVisible] = useState(false);
   const heroSectionRef = useRef(null);
+  const tiltRafRef = useRef(null);
+  const pendingTiltXRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (tiltRafRef.current) {
+        cancelAnimationFrame(tiltRafRef.current);
+      }
+    };
+  }, []);
   const portraitAnchorRef = useRef(null);
   const rootRef = useRef(null);
   const navLockRef = useRef(false);
@@ -36,8 +46,6 @@ export default function App() {
   const [projectFilter, setProjectFilter] = useState('All');
   const [activeProjectModal, setActiveProjectModal] = useState(null);
 
-  // Hero 3D parallax state
-  const [heroTilt, setHeroTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50 });
 
   // Optional Brief Modal
   const [showContactFormModal, setShowContactFormModal] = useState(false);
@@ -320,16 +328,24 @@ export default function App() {
           onMouseMove={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
             const px = (e.clientX - rect.left) / rect.width - 0.5;
-            const py = (e.clientY - rect.top) / rect.height - 0.5;
-            setHeroTilt({
-              rx: py * 14,
-              ry: px * 18,
-              gx: (px + 0.5) * 100,
-              gy: (py + 0.5) * 100
-            });
+            pendingTiltXRef.current = (px * 18) * -0.4;
+            if (!tiltRafRef.current) {
+              tiltRafRef.current = requestAnimationFrame(() => {
+                tiltRafRef.current = null;
+                if (heroSectionRef.current) {
+                  heroSectionRef.current.style.setProperty('--hero-tilt-x', `${pendingTiltXRef.current}px`);
+                }
+              });
+            }
           }}
           onMouseLeave={() => {
-            setHeroTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
+            if (tiltRafRef.current) {
+              cancelAnimationFrame(tiltRafRef.current);
+              tiltRafRef.current = null;
+            }
+            if (heroSectionRef.current) {
+              heroSectionRef.current.style.setProperty('--hero-tilt-x', '0px');
+            }
           }}
           className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col justify-end pb-8 sm:pb-12 overflow-hidden"
           style={{ background: 'radial-gradient(circle at 50% 35%, #181818 0%, #050505 80%)' }}
@@ -373,7 +389,6 @@ export default function App() {
             runId={introRunId}
             onSlideDown={handleSlideDown}
             onComplete={() => {}}
-            heroTilt={heroTilt}
           />
 
           {/* LAYER 3 (z-30): Bottom Row — Left: Full-Stack Developer | Right: ↙ + Contact */}

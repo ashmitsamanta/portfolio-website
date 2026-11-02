@@ -8,8 +8,7 @@ const INITIAL_LETTERS = ['A', 'S', 'H', 'M', 'I', 'T'];
 export default function PreloaderWordmark({
   runId = 0,
   onSlideDown,
-  onComplete,
-  heroTilt = { rx: 0, ry: 0 }
+  onComplete
 }) {
   const wordmarkRef = useRef(null);
   const dotRef = useRef(null);
@@ -259,7 +258,7 @@ export default function PreloaderWordmark({
     <div
       className="relative z-20 w-full flex justify-center pointer-events-none mb-5"
       style={{
-        transform: isSlidDown ? `translate3d(${heroTilt.ry * -0.4}px, 0, 0)` : 'none',
+        transform: isSlidDown ? 'translate3d(var(--hero-tilt-x, 0px), 0, 0)' : 'none',
         transition: isSlidDown ? 'transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'
       }}
     >
