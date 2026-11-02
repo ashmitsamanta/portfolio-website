@@ -285,6 +285,11 @@ export default function App() {
             repeating-radial-gradient(circle at 15% 85%, rgba(255,255,255,0.025) 0px, rgba(0,0,0,0.9) 28px, rgba(255,255,255,0.03) 56px);
           animation: liquidWave 16s ease-in-out infinite;
         }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-marquee-left,
+          .animate-marquee-right { animation: none; }
+          .liquid-marble-bg { animation: none; }
+        }
       `}</style>
 
 
