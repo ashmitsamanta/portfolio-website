@@ -18,7 +18,6 @@ const MARQUEE_ROWS = [
     'Python',
     'FastAPI',
     'PostgreSQL',
-    'SQLAlchemy',
     'Django',
     'Supabase',
     'Node.js',
@@ -32,15 +31,12 @@ const MARQUEE_ROWS = [
     'JWT / Auth',
     'OCR Pipelines',
     'Face Matching',
-    'Deepfake Detection',
-    'SSE Streaming'
+    'Deepfake Detection'
   ],
   [
     'Docker',
     'Git',
     'GitHub Actions',
-    'CI/CD',
-    'Postman',
     'VS Code',
     'Linux',
     'Playwright'
