@@ -164,9 +164,9 @@ export default function ContactSection({
             <div className="lg:col-span-6 space-y-6">
               <div
                 data-contact-pill
-                className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-300"
+                className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-neutral-300"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse motion-reduce:animate-none" />
                 <span>AVAILABLE FOR WORK</span>
               </div>
 
@@ -210,7 +210,7 @@ export default function ContactSection({
               >
                 <div data-contact-row className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
                   <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-1">
+                    <div className="font-mono text-[11px] uppercase tracking-widest text-[#8A8A8A] mb-1">
                       EMAIL
                     </div>
                     <div className="text-sm sm:text-base text-white break-all">
@@ -229,14 +229,14 @@ export default function ContactSection({
 
 
                 <div data-contact-row className="border-b border-white/[0.08] pb-5">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-1">
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-[#8A8A8A] mb-1">
                     BASED IN
                   </div>
                   <div className="text-sm sm:text-base text-white">{config.personal.location}</div>
                 </div>
 
                 <div data-contact-row>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-[#8A8A8A] mb-3">
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-[#8A8A8A] mb-3">
                     ELSEWHERE
                   </div>
                   <div className="flex items-center gap-3">

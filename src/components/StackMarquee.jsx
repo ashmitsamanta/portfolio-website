@@ -75,7 +75,7 @@ export default function StackMarquee({
           onClick={() => {
             setMarqueePaused((p) => !p);
           }}
-          className="px-3 py-1 rounded-full bg-[#0D0D0D] border border-white/10 font-mono text-[10px] uppercase tracking-wider text-neutral-400 hover:text-white shrink-0"
+          className="px-3 py-1 rounded-full bg-[#0D0D0D] border border-white/10 font-mono text-[11px] uppercase tracking-wider text-neutral-400 hover:text-white shrink-0"
         >
           {marqueePaused ? 'Resume' : 'Pause'}
         </button>
@@ -84,7 +84,7 @@ export default function StackMarquee({
           onClick={() => {
             setShowStackGrid((g) => !g);
           }}
-          className="px-3 py-1 rounded-full bg-[#0D0D0D] border border-white/10 font-mono text-[10px] uppercase tracking-wider text-neutral-400 hover:text-white shrink-0"
+          className="px-3 py-1 rounded-full bg-[#0D0D0D] border border-white/10 font-mono text-[11px] uppercase tracking-wider text-neutral-400 hover:text-white shrink-0"
         >
           {showStackGrid ? 'Hide Layer Filter' : 'Filter by Layer'}
         </button>
