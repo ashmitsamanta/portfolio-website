@@ -238,7 +238,7 @@ export default function ArcadeMinigame({
         const newWidth = Math.floor(entry.contentRect.width);
         if (newWidth > 0 && newWidth !== prevWidth) {
           prevWidth = newWidth;
-          if (gameRef.current.status === 'idle') {
+          if (gameRef.current.status === 'idle' || gameRef.current.status === 'playing') {
             initGameCanvas(false);
           }
         }
