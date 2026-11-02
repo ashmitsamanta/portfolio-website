@@ -99,7 +99,7 @@ export const PORTFOLIO_CONFIG: PortfolioConfig = {
     {
       id: 'devops',
       label: 'DevOps, QA & Tooling',
-      items: ['Docker', 'Git', 'GitHub Actions', 'CI/CD', 'Postman', 'VS Code', 'Linux', 'Playwright']
+      items: ['Docker', 'Git', 'GitHub Actions', 'VS Code', 'Linux', 'Playwright']
     }
   ],
   services: [

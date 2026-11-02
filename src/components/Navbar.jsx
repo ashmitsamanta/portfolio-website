@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PORTFOLIO_CONFIG } from '../config/portfolio.config';
+import ScrollProgress from './ScrollProgress';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'HOME' },
@@ -112,6 +113,7 @@ export default function Navbar({
           ))}
         </div>
       )}
+      <ScrollProgress />
     </header>
   );
 }
