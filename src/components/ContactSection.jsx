@@ -347,34 +347,39 @@ export default function ContactSection({
                 aria-hidden="true"
               />
               <div>
-                <label className="block font-mono text-xs uppercase text-neutral-400 mb-1">
+                <label htmlFor="contact-name" className="block font-mono text-xs uppercase text-neutral-400 mb-1">
                   Your Name
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
                   required
+                  autoComplete="name"
                   value={contactForm.name}
                   onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white"
                 />
               </div>
               <div>
-                <label className="block font-mono text-xs uppercase text-neutral-400 mb-1">
+                <label htmlFor="contact-email" className="block font-mono text-xs uppercase text-neutral-400 mb-1">
                   Your Email
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
                   required
+                  autoComplete="email"
                   value={contactForm.email}
                   onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white"
                 />
               </div>
               <div>
-                <label className="block font-mono text-xs uppercase text-neutral-400 mb-1">
+                <label htmlFor="contact-message" className="block font-mono text-xs uppercase text-neutral-400 mb-1">
                   Message
                 </label>
                 <textarea
+                  id="contact-message"
                   rows={4}
                   required
                   value={contactForm.message}
